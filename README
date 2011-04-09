@@ -1,0 +1,12 @@
+Steps to set up dev environment
+
+1. Create a github account and upload your public key
+   Goto github.com/jtbates/cs252-lab6 and click watch.  I will add you as a 
+   collaborator.
+2. Install Android SDK and the ADT Plugin in Eclipse.
+3. Install EGit in Eclipse (http://download.eclipse.org/egit/updates)
+4. Clone the repo in your Eclipse workspace directory
+   git clone git@github.com:jtbates/cs252-lab6.git lab6
+5. In Eclipse, go to Import -> General -> Existing Projects into Workspace and 
+   select the lab6 folder (you might need to run Clean... to get it to build)
+
