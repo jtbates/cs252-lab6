@@ -17,5 +17,5 @@ Steps to set up dev environment
 In Eclipse, right click the project and go to Team -> to access the Git 
 commands.  Commit saves your changes to your local repository, push to 
 upstream sends your patches to the main repo on Github (similar to svn 
-commit), pull updates your local repo to the newest version from the main 
-repo (similar to svn update).
+commit), fetch from upstream updates your local repo to the newest version 
+from the main repo (similar to svn update).
