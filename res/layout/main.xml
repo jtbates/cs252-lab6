@@ -5,5 +5,9 @@
     android:layout_height="fill_parent"
     >
 
+<TextView android:text="Enter the server to connect to" android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+<EditText android:text="10.0.2.2" android:id="@+id/EditTextServer" android:layout_width="wrap_content" android:layout_height="wrap_content"></EditText>
 <Button android:text="Connect to Directory Server" android:id="@+id/ButtonConnectDS" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+
+
 </LinearLayout>

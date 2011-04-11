@@ -17,8 +17,6 @@ public class DirectoryServer {
 	static final int SERVERPORT = 25201;
 	
 	public static void main(String[] args) {
-		//Logger.global.setLevel(Level.OFF);
-		
 		try {
 			// Create a socket for handling incoming requests
 			ServerSocket server = new ServerSocket(SERVERPORT);
