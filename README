@@ -7,6 +7,15 @@ Steps to set up dev environment
 3. Install EGit in Eclipse (http://download.eclipse.org/egit/updates)
 4. Clone the repo in your Eclipse workspace directory
    git clone git@github.com:jtbates/cs252-lab6.git lab6
+   Add a .gitignore file with:
+   bin
+   gen
 5. In Eclipse, go to Import -> General -> Existing Projects into Workspace and 
    select the lab6 folder (you might need to run Clean... to get it to build)
+6. Go to the Git Repository Exploring perspective and add your local repository
 
+In Eclipse, right click the project and go to Team -> to access the Git 
+commands.  Commit saves your changes to your local repository, push to 
+upstream sends your patches to the main repo on Github (similar to svn 
+commit), fetch from upstream updates your local repo to the newest version 
+from the main repo (similar to svn update).
