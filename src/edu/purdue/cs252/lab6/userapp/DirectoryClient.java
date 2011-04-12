@@ -10,9 +10,10 @@ import java.net.UnknownHostException;
 
 import android.util.Log;
 
-public class RingerClient implements Runnable {
+public class DirectoryClient implements Runnable {
 	static public String SERVERNAME = "10.0.2.2";
-	static public int SERVERPORT = 25202;
+	static public int SERVERPORT = 25201;
+	static public Object initMonitor = new Object();
 	
 	public void run() {
 		try {
@@ -26,18 +27,17 @@ public class RingerClient implements Runnable {
 			Log.d("TCP", "C: Sending a packet.");
 			PrintWriter out = new PrintWriter(new BufferedWriter(
 					new OutputStreamWriter(clientSocket.getOutputStream())), true);
-			out.println("Hello from RingerClient");
+			out.println("Hello from DirectoryClient");
 			Log.d("TCP", "C: Sent.");
 			Log.d("TCP", "C: Done.");
 
-			// Start the voice player server
-        	new Thread(new VoicePlayerServer()).start();
-			
-        	// Start voice capture client
-        	new Thread(new VoiceCaptureClient()).start();
-			
-        	// Close the connection
+			// Close the connection
 			clientSocket.close();
+			
+			// Notify waiting threads that directory has finished loading
+			synchronized(initMonitor) {
+				initMonitor.notifyAll();
+			}
 		} catch (UnknownHostException e) {
 			Log.e("TCP", "C: Error", e);
 		} catch (IOException e) {
