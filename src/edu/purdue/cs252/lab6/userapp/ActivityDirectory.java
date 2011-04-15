@@ -3,6 +3,8 @@ package edu.purdue.cs252.lab6.userapp;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -56,6 +58,8 @@ public class ActivityDirectory extends Activity {
     @Override
     public void onResume() {
     	super.onResume();
+    	
+    	// Capture ACTION_INCOMINGCALL broadcast
     	IntentFilter intentFilter = new IntentFilter(RingerServer.ACTION_INCOMINGCALL);
     	registerReceiver(new IncomingCallReceiver(),intentFilter);
     }
@@ -71,5 +75,16 @@ public class ActivityDirectory extends Activity {
     
     public void removeUser() {
     	
+    }
+    
+    private class IncomingCallReceiver extends BroadcastReceiver {
+
+    	@Override
+    	public void onReceive(Context context, Intent intent) {
+        	// Switch to incoming call activity
+        	Intent callIncomingIntent = new Intent(context,ActivityCallIncoming.class);
+        	((Activity) context).startActivityForResult(callIncomingIntent,0);
+    	}
+
     }
 }
