@@ -19,3 +19,7 @@ commands.  Commit saves your changes to your local repository, push to
 upstream sends your patches to the main repo on Github (similar to svn 
 commit), fetch from upstream updates your local repo to the newest version 
 from the main repo (similar to svn update).
+
+If you want to access Github Issues in Eclipse, install Mylyn and the Github Mylyn Connector.  Their site-urls are:
+http://download.eclipse.org/mylyn/releases/latest
+http://devsprint.github.com/org.eclipse.mylyn.github/site
