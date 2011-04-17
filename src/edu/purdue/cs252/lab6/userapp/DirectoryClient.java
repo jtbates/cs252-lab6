@@ -8,7 +8,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import edu.purdue.cs252.lab6.user.User;
+import edu.purdue.cs252.lab6.User;
 
 import android.util.Log;
 

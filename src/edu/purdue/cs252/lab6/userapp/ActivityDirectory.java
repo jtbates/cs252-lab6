@@ -3,7 +3,7 @@ package edu.purdue.cs252.lab6.userapp;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import edu.purdue.cs252.lab6.user.User;
+import edu.purdue.cs252.lab6.User;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;

@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -13,7 +14,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import edu.purdue.cs252.lab6.user.User;
+import edu.purdue.cs252.lab6.User;
 
 public class DirectoryServer {
 	static final String SERVERIP = "127.0.0.1";
@@ -42,9 +43,11 @@ public class DirectoryServer {
 
 				// Read data from the client
 				InputStream stream = clientSocket.getInputStream();
+				ObjectInputStream ois = new ObjectInputStream(stream); 
+				
 				// InputStream is an abstract class. We needed to use a subclass
 				BufferedReader data = new BufferedReader(new InputStreamReader(stream));
-
+				
 				// Read a line at a time
 				String line;
 				while ((line = data.readLine()) != null) {
