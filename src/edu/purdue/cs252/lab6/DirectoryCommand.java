@@ -1,6 +1,6 @@
 package edu.purdue.cs252.lab6;
 
-public enum DirectoryCommands {
+public enum DirectoryCommand {
 	// commands that the client sends to the server
 	C_LOGIN, // logs the user in; argument is the client's User class
 	C_LOGOUT, // no argument

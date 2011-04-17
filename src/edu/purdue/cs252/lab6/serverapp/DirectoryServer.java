@@ -56,8 +56,12 @@ class doComms implements Runnable
 				InputStream stream = server.getInputStream();
 				ObjectInputStream ois = new ObjectInputStream(stream); 
 
+				DirectoryCommand command = ois.readInt();
+				
+				
 				// InputStream is an abstract class. We needed to use a subclass
 				BufferedReader data = new BufferedReader(new InputStreamReader(stream));
+				
 				
 				// Read a line at a time
 				String line;
