@@ -6,27 +6,32 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import edu.purdue.cs252.lab6.DirectoryCommand;
+import edu.purdue.cs252.lab6.User;
 
 public class DirectoryServer {
 	static final String SERVERIP = "127.0.0.1";
 	static final int SERVERPORT = 25201, MAXC = 10;
 	
 	public static void main(String[] args) {
+		DirectoryServer dserver = new DirectoryServer();
 		int i = 0;
 
 		try {
 			// Create a socket for handling incoming requests
 			ServerSocket listener = new ServerSocket(SERVERPORT);
-			Socket server;
+			Socket client;
 			
 			while((i++ < MAXC) || (MAXC == 0)){
 				System.out.println("TCP S: Waiting for new connection...");
-		        	server = listener.accept();
+		        	client = listener.accept();
 				System.out.println("TCP S: New connection received.");
-		        	doComms conn_c= new doComms(server);
-		        	Thread t = new Thread(conn_c);
+		        	acceptThread connect = dserver.new acceptThread(client);
+		        	Thread t = new Thread(connect);
 		        	t.start();
 		      }
 		} catch (IOException e) {
@@ -34,37 +39,81 @@ public class DirectoryServer {
 			e.printStackTrace();
 		}
 	}
-}
-
-class doComms implements Runnable
-{
-	private Socket server;
 	
-	doComms(Socket server)
+	class acceptThread implements Runnable
 	{
-		this.server = server;
+		private Socket client;
+		
+		acceptThread(Socket client)
+		{
+			this.client = client;
+		}
+		
+		public void run()
+		{
+			try
+			{
+					// Read data from the client
+					InputStream stream = client.getInputStream();
+					ObjectInputStream ois = new ObjectInputStream(stream); 
+					
+					DirectoryCommand command = (DirectoryCommand)ois.readObject();
+					if(command != DirectoryCommand.C_LOGIN) 
+						throw new IOException("Unrecognized command: " + command.toString());
+					
+					User u = (User)ois.readObject();
+				
+					login(u,client);
+					
+					switch(command) {
+						case C_LOGOUT:
+							
+							break;
+						case C_GETDIRECTORY:
+						
+							break;
+						case C_PLACECALL:
+							
+							break;
+						case C_ACCEPTCALL:
+							
+							break;
+						default:
+							// error, unrecognized command
+					}
+					
+
+
+					
+			} catch (IOException e) {
+				System.out.println("TCP S: Error" + e);
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
 	}
 	
-	public void run()
-	{
-		try
-		{
-				// Read data from the client
-				InputStream stream = server.getInputStream();
-				// InputStream is an abstract class. We needed to use a subclass
-				BufferedReader data = new BufferedReader(new InputStreamReader(stream));
-
-				// Read a line at a time
-				String line;
-				while ((line = data.readLine()) != null) {
-					System.out.println("TCP S: Received: '" + line + "'");
-					}
-				System.out.println("TCP S: Done.");
-				server.close();
-				
-		} catch (IOException e) {
-			System.out.println("TCP S: Error" + e);
-			e.printStackTrace();
+	private class clientThread implements Runnable {
+		private Socket client;
+		
+		clientThread(Socket client) {
+			
+		}
+		
+		public void run() {
+			
 		}
 	}
+
+	private void login(User u, Socket client) {
+		
+	}
+
 }
+
+
+
+
+
