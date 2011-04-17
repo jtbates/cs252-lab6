@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class ActivityHome extends Activity {
 	
@@ -19,12 +20,12 @@ public class ActivityHome extends Activity {
         final EditText editTextServer = (EditText) findViewById(R.id.EditTextServer);
         final Button buttonSignIn = (Button) findViewById(R.id.ButtonSignIn);
         
-        
         buttonSignIn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
             	// Set directory server
             	DirectoryClient.SERVERNAME = editTextServer.getText().toString();
             	System.out.println(DirectoryClient.SERVERNAME);
+            	
             	
             	//Switch Statement added in case multiple buttons are added to the original screen
             	switch (v.getId()) {
@@ -37,8 +38,7 @@ public class ActivityHome extends Activity {
             			break;
             	}
             	
-                
-
+               
             }
         });
     }

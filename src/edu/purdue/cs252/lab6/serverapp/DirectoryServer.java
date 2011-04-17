@@ -20,7 +20,6 @@ public class DirectoryServer {
 			// Create a socket for handling incoming requests
 			ServerSocket listener = new ServerSocket(SERVERPORT);
 			Socket server;
-
 			
 			while((i++ < MAXC) || (MAXC == 0)){
 				System.out.println("TCP S: Waiting for new connection...");
