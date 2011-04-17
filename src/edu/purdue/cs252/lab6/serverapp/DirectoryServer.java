@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
 
 import edu.purdue.cs252.lab6.DirectoryCommand;
 import edu.purdue.cs252.lab6.User;
@@ -16,6 +17,9 @@ import edu.purdue.cs252.lab6.User;
 public class DirectoryServer {
 	static final String SERVERIP = "127.0.0.1";
 	static final int SERVERPORT = 25201, MAXC = 10;
+	
+	//Userlist for storing the users logged into the directory server
+	private final ConcurrentHashMap<String, User> userList = new ConcurrentHashMap<String, User>();
 	
 	public static void main(String[] args) {
 		DirectoryServer dserver = new DirectoryServer();
@@ -25,7 +29,6 @@ public class DirectoryServer {
 			// Create a socket for handling incoming requests
 			ServerSocket listener = new ServerSocket(SERVERPORT);
 			Socket client;
-
 			
 			while((i++ < MAXC) || (MAXC == 0)){
 				System.out.println("TCP S: Waiting for new connection...");
@@ -68,7 +71,6 @@ public class DirectoryServer {
 					
 
 					
-
 
 					
 			} catch (IOException e) {
@@ -126,6 +128,14 @@ public class DirectoryServer {
 	}
 
 	private void login(User u, Socket client) {
+		
+		//if the user name is already taken
+		if (userList.containsKey(u.getUserName())) {
+			//Send message back to client that user name is invlaid
+		}
+		else {
+			
+		}
 		
 	}
 

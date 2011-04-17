@@ -16,13 +16,20 @@ public class DirectoryClient implements Runnable {
 	static public String SERVERNAME = "10.0.2.2";
 	static public int SERVERPORT = 25201;
 	static public Object initMonitor = new Object();
-	
+
 	private User usr;
+	private int Mode;
 	
+	/*
+	* Summary:      Constructor for directory client
+	* Parameters:   String usrName
+	* Return: 		none
+	*/   
 	public DirectoryClient(String usrName) {
 		usr = new User(usrName);
 	}
-	                                   
+
+	
 	public void run() {
 		try {
 			InetAddress serverAddr = InetAddress.getByName(SERVERNAME);

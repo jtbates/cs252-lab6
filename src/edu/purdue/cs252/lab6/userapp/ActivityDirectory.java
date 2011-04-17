@@ -43,6 +43,7 @@ public class ActivityDirectory extends ListActivity {
 		builder.setMessage("Are you sure you want to connect to " + keyword + "?")
 		       .setCancelable(false)
 		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		    	   //Clicking Yes on the dialog box
 		    	   public void onClick(DialogInterface dialog, int id) {
 		    		   //TODO : implement the connect to the next user
 		    		   //Write to log to check if it is working
@@ -50,6 +51,7 @@ public class ActivityDirectory extends ListActivity {
 		           }
 		       })
 		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
+		    	   //Clicking No on the dialog box
 		           public void onClick(DialogInterface dialog, int id) {
 		               //cancel dialog action 
 		        	   dialog.cancel();
@@ -94,6 +96,8 @@ public class ActivityDirectory extends ListActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
    		
 		/*Start ringer server
 		

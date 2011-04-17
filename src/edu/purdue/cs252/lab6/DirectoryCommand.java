@@ -13,10 +13,11 @@ public enum DirectoryCommand {
 	S_CALLACCEPTED(0x21), // the outgoing call was accepted by the recipient; no argument
 	S_REDIRECT_INIT(0x22), // specifies the port on the server the user will user for the call; argument is int
 	S_REDIRECT_READY(0x23), // tells the client that the other user is ready to receive communications 
+	S_INVALID_USER(0x24), // tells the client that the username is already taken
 	
 	// commands the server broadcasts to all clients
-	S_BC_USERLOGGEDIN(0x24), // a user logged in; argument is the user's User class
-	S_BC_USERLOGGEDOUT(0x25); // a user logged out; argument is the user's username (String)
+	S_BC_USERLOGGEDIN(0x25), // a user logged in; argument is the user's User class
+	S_BC_USERLOGGEDOUT(0x26); // a user logged out; argument is the user's username (String)
 
 	private int code;
 	
