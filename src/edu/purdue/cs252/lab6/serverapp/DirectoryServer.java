@@ -66,22 +66,7 @@ public class DirectoryServer {
 				
 					login(u,client);
 					
-					switch(command) {
-						case C_LOGOUT:
-							
-							break;
-						case C_GETDIRECTORY:
-						
-							break;
-						case C_PLACECALL:
-							
-							break;
-						case C_ACCEPTCALL:
-							
-							break;
-						default:
-							// error, unrecognized command
-					}
+
 					
 
 
@@ -90,7 +75,7 @@ public class DirectoryServer {
 				System.out.println("TCP S: Error" + e);
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
+				System.out.println("TCP S: Error " + e);
 				e.printStackTrace();
 			}
 		}	
@@ -100,11 +85,43 @@ public class DirectoryServer {
 		private Socket client;
 		
 		clientThread(Socket client) {
-			
+			this.client = client;
 		}
 		
 		public void run() {
-			
+			try {
+				ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+				while(true) {
+					try {
+						DirectoryCommand command = (DirectoryCommand) ois.readObject();
+						switch(command) {
+							case C_LOGOUT:
+								
+								break;
+							case C_GETDIRECTORY:
+							
+								break;
+							case C_PLACECALL:
+								
+								break;
+							case C_ACCEPTCALL:
+								
+								break;
+							default:
+								// error, unrecognized command
+								throw new IOException("Unrecognized command: " + command.getCode());
+						}
+					}
+					catch(ClassNotFoundException e) {
+						System.out.println("TCP S: Error " + e);
+						e.printStackTrace();
+					}
+				}
+			}
+			catch(IOException e) {
+				System.out.println("TCP S: Error " + e);
+				e.printStackTrace();
+			}
 		}
 	}
 
