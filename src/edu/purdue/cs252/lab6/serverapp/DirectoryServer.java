@@ -11,12 +11,25 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+
+import edu.purdue.cs252.lab6.user.User;
 
 public class DirectoryServer {
 	static final String SERVERIP = "127.0.0.1";
 	static final int SERVERPORT = 25201;
 	
+	
 	public static void main(String[] args) {
+		//UserList stored in an Arraylist
+		ArrayList<User> userList = new ArrayList<User>();
+        
+		//Temp UserNames for testing
+		userList.add(new User("User 1"));
+		userList.add(new User("User 2"));
+		userList.add(new User("User 3"));
+		userList.add(new User("User 4"));
+		
 		try {
 			// Create a socket for handling incoming requests
 			ServerSocket server = new ServerSocket(SERVERPORT);
@@ -35,6 +48,25 @@ public class DirectoryServer {
 				// Read a line at a time
 				String line;
 				while ((line = data.readLine()) != null) {
+					
+					//If it is a new User logging in the first 5 letters will be login:
+					if (line.substring(0,6).equals("login:")) {
+						System.out.println("Adding to the user List");
+						String name = line.substring(6);
+						User temp = new User(name);
+						
+						//Check if the user is already logged in
+						if (userList.contains(temp)) {
+							userList.add(new User(name));
+						}
+						
+					}
+					//If the directory client is requesting the usernames
+					else if (line.equals("GET USERNAMES")) {
+						
+					}
+					
+					
 					System.out.println("TCP S: Received: '" + line + "'");
 				}
 				System.out.println("TCP S: Done.");
