@@ -108,6 +108,7 @@ public class DirectoryServer {
 		private ObjectInputStream ois;
 		private ObjectOutputStream oos;
 		private Thread thread;
+		private Call call;
 		
 		Client(User user, Socket client) throws ClassNotFoundException, StreamCorruptedException, IOException {
 			this.client = client;
@@ -133,6 +134,8 @@ public class DirectoryServer {
 								case C_CALL_ANSWER:
 									call_answer((String) ois.readObject());
 									break;
+								case C_CALL_READY:
+									call_ready();
 								case C_CALL_HANGUP:
 									call_hangup();
 								default:
@@ -179,6 +182,11 @@ public class DirectoryServer {
 				callMap.put(username, call);
 
 				client2.call_accepted(username);
+				
+				synchronized(client) {
+					oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
+					oos.writeInt(call.getPort(username));
+				}
 			}
 		}
 		
@@ -190,7 +198,6 @@ public class DirectoryServer {
 		}
 		
 		private void call_hangup() throws IOException {
-			Call call = callMap.get(username);
 			if(call == null) {
 				throw new IllegalStateException("User " + username + " attempted to disconnect from a call not found in callMap");
 			}
@@ -198,15 +205,34 @@ public class DirectoryServer {
 				call.disconnect(username);
 			}
 		}
+		
+		private void call_ready() throws IOException {
+			if(call == null) {
+				throw new IllegalStateException("User " + username + " sends C_CALL_READY but no corresponding call in callMap");
+			}
+			else {
+				ArrayList<String> usernameList = call.getUsernameList();
+				for(int i=0;i<usernameList.size();i++) {
+					String username2 = usernameList.get(i);
+					if(!username2.equals(username)) {
+						clientMap.get(username2).call_beginSending(username);
+					}
+				}
+			}
+		}
+		
+		
+		// methods below do not correspond to commands from the client
+		// they are called by another Client object or Call object
 
-		private void call_incoming(String username2) throws IOException {
+		public void call_incoming(String username2) throws IOException {
 			synchronized(client) {
 				oos.writeObject(DirectoryCommand.S_CALL_INCOMING);
 				oos.writeObject(username2);
 			}
 		}
 
-		private void call_accepted(String username2) throws IOException {
+		public void call_accepted(String username2) throws IOException {
 			Call call = callMap.get(username2);
 			if(call == null) {
 				synchronized(client) {
@@ -226,19 +252,36 @@ public class DirectoryServer {
 			}
 		}
 		
-		private void call_disconnect(String username2) throws IOException {
+		public void call_disconnect(String username2) throws IOException {
 			synchronized(client) {
 				oos.writeObject(DirectoryCommand.S_CALL_DISCONNECT);
 				oos.writeObject(username2);
 			}
 		}
+		
+		public void call_beginSending(String username2) throws IOException {
+			synchronized(client) {
+				oos.writeObject(DirectoryCommand.S_REDIRECT_READY);
+				oos.writeObject(username2);
+			}
+		}
 
-		private void success(DirectoryCommand command) throws IOException {
+		public void success(DirectoryCommand command) throws IOException {
 			synchronized(client) {
 				oos.writeObject(DirectoryCommand.S_STATUS_OK);
 				oos.writeObject(command);
 			}
 		}
+	
+		
+		
+		/*private void writeObjects(ArrayList<Object> objList) throws IOException {
+			synchronized(client) {
+				for(int i=0;i<objList.size();i++) {
+					oos.writeObject(objList.get(i));
+				}
+			}
+		}*/
 		
 		private void logout() throws IOException {
 			clientMap.remove(username);
@@ -269,6 +312,10 @@ public class DirectoryServer {
 			MulticastSocket redirect = socketList.get(idMap.get(username));
 			if(redirect == null) return -1;
 			else return redirect.getLocalPort();
+		}
+		
+		ArrayList<String> getUsernameList() {
+			return usernameList;
 		}
 		
 		synchronized void connect(String username) throws IOException {
