@@ -1,6 +1,8 @@
 package edu.purdue.cs252.lab6;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 	private String userIP; //String Containing the userIP
 	private String userName; //String containing the username 
 	private boolean isConnected; //Boolean value which determines if the user is currently connected to another phone 

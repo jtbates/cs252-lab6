@@ -221,6 +221,21 @@ public class DirectoryServer {
 			}
 		}
 		
+		private void logout() throws IOException {
+			// Broadcast to all clients that a new user has logged in
+			for(String bc_username : userMap.keySet()) {
+				Client bc_client = clientMap.get(bc_username);
+				bc_client.user_loggedout(username);
+			}
+			
+			clientMap.remove(username);
+			thread.stop();
+			synchronized(client) {
+				ois.close();
+				oos.close();
+				client.close();
+			}
+		}
 		
 		// methods below do not correspond to commands from the client
 		// they are called by another Client object or Call object
@@ -273,8 +288,19 @@ public class DirectoryServer {
 			}
 		}
 	
-		
-		
+		public void user_loggedin(User user_loggedin) throws IOException {
+			synchronized(client) {
+				oos.writeObject(DirectoryCommand.S_BC_USERLOGGEDIN);
+				oos.writeObject(user_loggedin);
+			}
+		}
+	
+		public void user_loggedout(String username_loggedout) throws IOException {
+			synchronized(client) {
+				oos.writeObject(DirectoryCommand.S_BC_USERLOGGEDOUT);
+				oos.writeObject(username_loggedout);
+			}
+		}
 		/*private void writeObjects(ArrayList<Object> objList) throws IOException {
 			synchronized(client) {
 				for(int i=0;i<objList.size();i++) {
@@ -283,16 +309,7 @@ public class DirectoryServer {
 			}
 		}*/
 		
-		private void logout() throws IOException {
-			clientMap.remove(username);
-			thread.stop();
-			
-			synchronized(client) {
-				ois.close();
-				oos.close();
-				client.close();
-			}
-		}
+
 		
 	}
 
@@ -388,7 +405,14 @@ public class DirectoryServer {
 			userMap.put(username,user);
 			Client client = new Client(user,clientSocket);
 			clientMap.put(username,client);
+
+			// Broadcast to all clients that a new user has logged in
+			for(String bc_username : userMap.keySet()) {
+				Client bc_client = clientMap.get(bc_username);
+				bc_client.user_loggedin(user);
+			}
 		}
+		System.out.println("Login success!");
 		
 	}
 
