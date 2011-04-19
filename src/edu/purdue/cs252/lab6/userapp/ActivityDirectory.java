@@ -80,16 +80,19 @@ public class ActivityDirectory extends ListActivity {
         if (this.getIntent().getExtras() != null) {
         	userName = extras.getString("USER");
         }
-        Log.d("Login", userName);
         
         // Start the directory client
        	DirectoryClient dc = null;
 		
-       	dc = new DirectoryClient(userName);
+       	try {
+			dc = new DirectoryClient(userName);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		dc.setState(DirectoryCommand.C_LOGIN);
-   		Thread dcThread = new Thread(dc);
-   		dcThread.start();
    		
+		
    		try {
    			// wait until directory is loaded
    			synchronized(dc.initMonitor) {
@@ -100,7 +103,6 @@ public class ActivityDirectory extends ListActivity {
 			e.printStackTrace();
 		}
 	
-		
 		// Create an ArrayAdapter, that will actually make the dc.userList show
 		this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, dc.userList));
 		
