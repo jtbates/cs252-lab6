@@ -88,9 +88,6 @@ public class DirectoryServer {
 				
 					login(u,client);
 					
-
-					
-
 					
 			} catch (IOException e) {
 				System.out.println("TCP S: Error" + e);
@@ -113,8 +110,9 @@ public class DirectoryServer {
 		Client(User user, Socket client) throws ClassNotFoundException, StreamCorruptedException, IOException {
 			this.client = client;
 			this.username = user.getUserName();
-			this.ois = new ObjectInputStream(client.getInputStream());
+			//Changed order you must created outputStream before input or you the program will block.
 			this.oos = new ObjectOutputStream(client.getOutputStream());
+			this.ois = new ObjectInputStream(client.getInputStream());
 			thread = new Thread() {
 				public void run() {
 					while(true) {
@@ -390,6 +388,7 @@ public class DirectoryServer {
 			clientMap.put(username,client);
 		}
 		
+		System.out.println("Login Complete");
 	}
 
 }
