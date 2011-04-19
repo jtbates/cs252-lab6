@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StreamCorruptedException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -18,27 +19,33 @@ import edu.purdue.cs252.lab6.*;
 
 import android.util.Log;
 
-public class DirectoryClient implements Runnable {
+public class DirectoryClient extends Thread {
 	static public String SERVERNAME = "10.0.2.2";
 	static public int SERVERPORT = 25201;
 	static public Object initMonitor = new Object();
 
-	private User usr;
-	private int Mode;
+	//Current user login information
+	public User usr;
 
 	//Stores the userList
 	public String[] userList;
 	
 	//Controls the state of the program
-	public DirectoryCommand state = null;
+	private DirectoryCommand state = DirectoryCommand.C_WAITING;
 	
+	InetAddress serverAddr;
+	Socket clientSocket;
+		
 	/*
 	* Summary:      Constructor for directory client
 	* Parameters:   String usrName
 	* Return: 		none
 	*/   
-	public DirectoryClient(String usrName) {
+	public DirectoryClient(String usrName) throws Exception {
 		usr = new User(usrName);
+		serverAddr = InetAddress.getByName(SERVERNAME);
+		clientSocket = new Socket(serverAddr, SERVERPORT);
+		this.start();
 	}
 	
 	/*
@@ -65,11 +72,12 @@ public class DirectoryClient implements Runnable {
     	oos.flush();
     	
     	//Set the state to get the DirectoryCommand.C_Directory_Get
+    	//Because once the user is logged in we have to need to recieve all the directories
     	state = DirectoryCommand.C_DIRECTORY_GET;
 	}
 	
 	/*
-	* Summary:      Get the current users logged into the system
+	* Summary:      Ask the server for the directories
 	* Parameters:   Socket clientSocket
 	* Return: 		void
 	*/  
@@ -78,66 +86,133 @@ public class DirectoryClient implements Runnable {
 		ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
 		oos.writeObject((DirectoryCommand)DirectoryCommand.C_DIRECTORY_GET);
 		oos.flush();
-
-		//Creat the ObjectInputstream and get the incoming directory command and hashmap
-		ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-		DirectoryCommand dc = (DirectoryCommand)ois.readObject();
-		ConcurrentHashMap<String,User> temp = (ConcurrentHashMap<String,User>)ois.readObject();
-
-		Iterator i = temp.entrySet().iterator();
-		userList = new String[temp.size()];
 		
-		int c = 0;
-		//Traverse the Hashmap
-		while(i.hasNext()) {
-			Map.Entry<String,User>  me = (Map.Entry<String,User> )i.next();
-			String user = me.getKey();
-			Log.d("User", user);
-			
-			//Something to represent yourself on the user list
-			if (user.equals(usr.getUserName())) {
-				userList[c] = me.getKey() + "(You)";
-			} else {
-				userList[c] = me.getKey();
-			}
-			c = c + 1;
-		}
-		state = null;
+		state = DirectoryCommand.C_WAITING;
 	}
+	
 	
 	public void run() {
 		
-		/*
-		 * Server is not in a loop at the moment
-		 * First is the user is logged in then the the directory is fetched
-		 */
+		ReceiveThread receiver = null;
 		try {
-			InetAddress serverAddr = InetAddress.getByName(SERVERNAME);
-			Socket clientSocket = new Socket(serverAddr, SERVERPORT);
-			
-			if (state == DirectoryCommand.C_LOGIN) {
-				login(clientSocket);
-			}
-			
-			if (state == DirectoryCommand.C_DIRECTORY_GET) {
-				getDirectories(clientSocket);
-				
-				// Notify waiting threads that directory has finished loading
-				synchronized(initMonitor) {
-					initMonitor.notifyAll();
-				}
-			}		
-			
-			
-		} catch (UnknownHostException e) {
-			Log.e("TCP", "C: Error", e);
-		} catch (IOException e) {
-			Log.e("TCP", "C: Error", e);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			receiver = new ReceiveThread(clientSocket, this);
+		} catch (Exception e) {
 			Log.e("TCP", "C: Error", e);
 		}
 		
+		//Boolean to ensure the receiver is only called once
+		boolean started = false;
+		
+		
+		while(true) {
+			
+			if (!started) {
+				receiver.start();
+				started = true; 
+			}
+			
+			try {
+				switch(state) {
+					case C_LOGIN:
+						Log.d("Client Command", "C_LOGIN");
+						login(clientSocket);
+						break;
+					case C_DIRECTORY_GET:
+						getDirectories(clientSocket);
+						Log.d("Client Command", "C_DIRECTORY_GET");
+					default:
+						//yield();
+						break;
+				}
+				
+			} catch (UnknownHostException e) {
+				Log.e("TCP", "C: Error", e);
+			} catch (IOException e) {
+				Log.e("IO", "C: Error", e);
+			} catch (ClassNotFoundException e) {
+				Log.e("ClassNotFound", "C: Error", e);
+			}
+		}
 		
 	}
 }
+
+/*
+ * Thread for Receiving messages from the directory server
+ * 
+ */
+class ReceiveThread extends Thread {
+	   private Socket client = null;
+	   private DirectoryClient dClient;
+
+	   /*
+		* Summary:      Constructor for ReceiveThread
+		* Parameters:   Socket clientSocket, DrectoryClient dc
+		* Return: 		void
+		*/  
+	   public ReceiveThread(Socket clientSocket, DirectoryClient dc) throws Exception{
+	     client = clientSocket;
+	     this.dClient = dc;
+	   }
+
+	   /*
+		* Summary:      Receives the HashMap from the server, saves it into the directoryClient userlist and notfity the initMonitor
+		* Parameters:  	ObjectInputStream ois
+		* Return: 		void
+		*/
+	   public void recieveDirectories(ObjectInputStream ois) throws StreamCorruptedException, IOException, ClassNotFoundException {
+			//Create the ObjectInputstream and get the incoming directory command and HashMap
+			ConcurrentHashMap<String,User> temp = (ConcurrentHashMap<String,User>)ois.readObject();
+
+			Iterator i = temp.entrySet().iterator();
+			dClient.userList = new String[temp.size()];
+			
+			int c = 0;
+			//Traverse the HashMap
+			while(i.hasNext()) {
+				Map.Entry<String,User>  me = (Map.Entry<String,User> )i.next();
+				String user = me.getKey();
+				Log.d("User", user);
+				
+				//Something to represent yourself on the user list
+				if (user.equals(dClient.usr.getUserName())) {
+					dClient.userList[c] = me.getKey() + "(You)";
+				} else {
+					dClient.userList[c] = me.getKey();
+				}
+				c = c + 1;
+			}
+			
+			// Notify waiting threads that directory has finished loading
+			synchronized(dClient.initMonitor) {
+				dClient.initMonitor.notifyAll();
+			}
+	   }
+	   
+	   /*
+		* Summary:      Run method, waits for message from the server and executes the correct command
+		* Parameters:   none
+		* Return: 		void
+		*/
+	   public void run() {
+		   while(true) {
+		      try {
+		    	  ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+		    	  DirectoryCommand dc = (DirectoryCommand)ois.readObject();
+		    
+					switch(dc) {
+						case S_STATUS_OK:
+							Log.d("Server Command", "S_STATUS_OK");
+							break;
+						case S_DIRECTORY_SEND:
+							Log.d("Server Command", "S_DIRECTORY_SEND");
+							recieveDirectories(ois);
+						default:
+							break;
+					}
+		       
+		      } catch(Exception e) {}       
+		   }
+	   }
+}
+
