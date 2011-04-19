@@ -386,6 +386,8 @@ public class DirectoryServer {
 			userMap.put(username,user);
 			Client client = new Client(user,clientSocket);
 			clientMap.put(username,client);
+			ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
+			oos.writeObject(DirectoryCommand.S_STATUS_OK);
 		}
 		
 		System.out.println("Login Complete");
