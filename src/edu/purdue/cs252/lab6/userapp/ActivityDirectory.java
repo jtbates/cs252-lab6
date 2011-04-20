@@ -1,8 +1,10 @@
 package edu.purdue.cs252.lab6.userapp;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import edu.purdue.cs252.lab6.DirectoryCommand;
 import edu.purdue.cs252.lab6.User;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,6 +32,11 @@ public class ActivityDirectory extends ListActivity {
 	public static final int RESULT_INTERRUPTED = 1;
 	public static final int RESULT_FAILED = 2;
 	
+	/*
+	* Summary:      Function called when a user is selected on the list
+	* Parameters:   ListView, l, view v, int position, long id
+	* Return: 		void
+	*/   
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
@@ -68,25 +75,24 @@ public class ActivityDirectory extends ListActivity {
         super.onCreate(savedInstanceState);
         Bundle extras = getIntent().getExtras();
         
-        //Temp user list stored
-        String[] names = new String[] { "User 1", "User 2", "User 3", "User 4"};
-		// Create an ArrayAdapter, that will actually make the Strings above
-		// appear in the ListView
-		this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names));
-    
         //Get the username sent from the previous activity
         String userName = "";
         if (this.getIntent().getExtras() != null) {
         	userName = extras.getString("USER");
         }
-        Log.d("Login", userName);
-        
         
         // Start the directory client
-       	DirectoryClient dc = new DirectoryClient(userName);
-   		Thread dcThread = new Thread(dc);
-   		dcThread.start();
+       	DirectoryClient dc = null;
+		
+       	try {
+			dc = new DirectoryClient(userName);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		dc.setState(DirectoryCommand.C_LOGIN);
    		
+		
    		try {
    			// wait until directory is loaded
    			synchronized(dc.initMonitor) {
@@ -96,9 +102,13 @@ public class ActivityDirectory extends ListActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	
+		// Create an ArrayAdapter, that will actually make the dc.userList show
+		this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, dc.userList));
 		
 		
-   		
+		//dc.setState(DirectoryCommand.C_DIRECTORY_GET);
+
 		/*Start ringer server
 		
 		//Intent rsIntent = new Intent(this, RingerServer.class);
