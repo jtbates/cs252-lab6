@@ -54,7 +54,8 @@ public class ActivityDirectory extends ListActivity {
 		
        	// Create an ArrayAdapter to user for our ListActivity
        	final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList);
-		this.setListAdapter(adapter);
+       	final ListActivity thisActivity = this;
+		thisActivity.setListAdapter(adapter);
 		
         // Start the directory client
        	dc = appState.getDirectoryClient();
@@ -81,6 +82,12 @@ public class ActivityDirectory extends ListActivity {
    	       			String username2 = (String)msg.obj;
    	       			userMap.remove(username2);
    	       			adapter.remove(username2);
+   	       		}
+   	       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
+   	       			String username2 = (String)msg.obj;
+   	       			Intent callIncomingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallIncoming.class);
+   	       			callIncomingIntent.putExtra("calling_username",username2);
+   	       			startActivity(callIncomingIntent);
    	       		}
    	       		else {
    	       			Log.e("AD","unrecognized message " + msg.what);
@@ -122,11 +129,11 @@ public class ActivityDirectory extends ListActivity {
 
 		//Get the last item that was clicked and store it into keyword
 		Object o = this.getListAdapter().getItem(position);
-		String keyword = o.toString();
+		String calling_username = o.toString();
 		
 		//Build the Alert Box
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Are you sure you want to connect to " + keyword + "?")
+		builder.setMessage("Are you sure you want to connect to " + calling_username + "?")
 		       .setCancelable(false)
 		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 		    	   //Clicking Yes on the dialog box
@@ -161,10 +168,10 @@ public class ActivityDirectory extends ListActivity {
 	@Override
     public void onResume() {
     	super.onResume();
-    	
+    	/*
     	// Capture ACTION_INCOMINGCALL broadcast
     	IntentFilter intentFilter = new IntentFilter(RingerServer.ACTION_INCOMINGCALL);
-    	registerReceiver(new IncomingCallReceiver(),intentFilter);
+    	registerReceiver(new IncomingCallReceiver(),intentFilter);*/
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

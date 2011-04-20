@@ -157,7 +157,7 @@ public class DirectoryClient {
 			while(!isInterrupted()) {
 				try {
 					DirectoryCommand command = (DirectoryCommand)ois.readObject();
-					Log.i("DC",command.toString());
+					Log.i("DC","Command: " + command.toString());
 					Message msg = readHandler.obtainMessage();
 					switch(command) {
 						case S_STATUS_OK:
@@ -178,12 +178,22 @@ public class DirectoryClient {
 							msg.what = DirectoryCommand.S_BC_USERLOGGEDIN.getCode();
 							msg.obj = user;
 							readHandler.sendMessage(msg);
+							break;
 						case S_BC_USERLOGGEDOUT:
-							String username = (String)ois.readObject();
+							Object obj = ois.readObject();
+							Log.i("DC",obj.toString() + " logged out");
+							String username = (String)obj;
 							msg.what = DirectoryCommand.S_BC_USERLOGGEDOUT.getCode();
 							msg.obj = username;
 							readHandler.sendMessage(msg);
 							Log.i("DC",username + " logged out");
+							break;
+						case S_CALL_INCOMING:
+							String caller_username = (String)ois.readObject();
+							Log.i("DC","Incoming call from " + caller_username);
+							msg.what = DirectoryCommand.S_CALL_INCOMING.getCode();
+							msg.obj = caller_username;
+							readHandler.sendMessage(msg);
 							break;
 						default:
 							Log.e("DC","Read error: unrecognized command");
@@ -236,6 +246,26 @@ public class DirectoryClient {
 		});
 	}
 
+	public void call_attempt(final String username2) {
+		Log.i("DC","Calling " + username2);
+		writeHandler.post(new Runnable() {
+			public void run() {
+				try {
+					synchronized(socket) {
+						oos.writeObject(DirectoryCommand.C_CALL_ATTEMPT);
+						oos.writeObject(username2);
+						oos.flush();
+						Log.i("DC","get directory write finish");
+
+					}
+				}
+				catch(IOException e) {
+					Log.e("DC", "Write error, get directory failed");
+				}
+			}
+		});		
+	}
+	
 	public void logout() {
 		Log.i("DC","Logging out...");
 		writeHandler.post(new Runnable() {
