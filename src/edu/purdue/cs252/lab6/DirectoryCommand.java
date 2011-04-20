@@ -2,7 +2,7 @@ package edu.purdue.cs252.lab6;
 
 public enum DirectoryCommand {
 	// commands that the client sends to the server
-	C_LOGIN(0x10), // logs the user in; argument is the client's User class
+	C_LOGIN(0X10), // logs the user in; argument is the client's User class
 	C_LOGOUT(0x11), // no argument
 	C_DIRECTORY_GET(0x12), // requests a listing of all logged in users; no argument
 	C_CALL_ATTEMPT(0x13), // argument is the username of the call recipient (String)
@@ -29,7 +29,6 @@ public enum DirectoryCommand {
 	S_BC_USERLOGGEDIN(0x40), // a user logged in; argument is the user's User class
 	S_BC_USERLOGGEDOUT(0x41); // a user logged out; argument is the user's username (String)
 	
-
 
 	private int code;
 	

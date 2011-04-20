@@ -1,22 +1,31 @@
 package edu.purdue.cs252.lab6.userapp;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import edu.purdue.cs252.lab6.DirectoryCommand;
 import edu.purdue.cs252.lab6.User;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.view.View.OnClickListener;
@@ -29,7 +38,84 @@ import android.view.View.OnClickListener;
 public class ActivityDirectory extends ListActivity {
 	public static final int RESULT_INTERRUPTED = 1;
 	public static final int RESULT_FAILED = 2;
+
+	private DirectoryClient dc;
 	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        final VoipApp appState = (VoipApp) getApplicationContext(); 
+        User user = appState.getUser();
+        Log.d("Login", user.getUserName());
+        
+        final ConcurrentHashMap<String,User> userMap = new ConcurrentHashMap<String,User>();
+       	final ArrayList<String> usernameList = new ArrayList<String>();
+		
+       	// Create an ArrayAdapter to user for our ListActivity
+       	final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList);
+		this.setListAdapter(adapter);
+		
+        // Start the directory client
+       	dc = appState.getDirectoryClient();
+       	Handler handler = new Handler() {
+       		public void handleMessage(Message msg) {
+       			Log.i("AH","adHandler");
+   	       		if(msg.what == DirectoryCommand.S_DIRECTORY_SEND.getCode()) {
+   	       			userMap.clear();
+					userMap.putAll((Map<String,User>)msg.obj);
+					
+					adapter.clear();
+					for(String username2 : userMap.keySet()) {
+						adapter.add(username2);
+						Log.i("AD","directory: " + username2);
+					}
+   	       		}
+   	       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDIN.getCode()) {
+   	       			User user2 = (User)msg.obj;
+   	       			String username2 = user2.getUserName();
+   	       			userMap.put(username2, user2);
+   	       			adapter.add(username2);
+   	       		}
+   	       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDOUT.getCode()) {
+   	       			String username2 = (String)msg.obj;
+   	       			userMap.remove(username2);
+   	       			adapter.remove(username2);
+   	       		}
+   	       		else {
+   	       			Log.e("AD","unrecognized message " + msg.what);
+   	       			// unrecognized message
+   	       			// TODO: handle error
+   	       		}
+       		}
+       	};
+       	dc.setReadHandler(handler);
+		dc.getDirectory();
+
+       	
+
+		
+	
+		/*Start ringer server
+		
+		//Intent rsIntent = new Intent(this, RingerServer.class);
+		//startService(rsIntent);
+		
+        final Button buttonCall = (Button) findViewById(R.id.ButtonCall);
+        buttonCall.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            	// Switch to outgoing call activity
+                Intent callOutgoingIntent = new Intent(v.getContext(), ActivityCallOutgoing.class);
+                startActivityForResult(callOutgoingIntent, 0);
+            }
+        });   */     
+    }
+	
+	/*
+	* Summary:      Function called when a user is selected on the list
+	* Parameters:   ListView, l, view v, int position, long id
+	* Return: 		void
+	*/   
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
@@ -63,57 +149,15 @@ public class ActivityDirectory extends ListActivity {
 		alert.show();
 	}
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Bundle extras = getIntent().getExtras();
-        
-        //Temp user list stored
-        String[] names = new String[] { "User 1", "User 2", "User 3", "User 4"};
-		// Create an ArrayAdapter, that will actually make the Strings above
-		// appear in the ListView
-		this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names));
-    
-        //Get the username sent from the previous activity
-        String userName = "";
-        if (this.getIntent().getExtras() != null) {
-        	userName = extras.getString("USER");
-        }
-        Log.d("Login", userName);
-        
-        
-        // Start the directory client
-       	DirectoryClient dc = new DirectoryClient(userName);
-   		Thread dcThread = new Thread(dc);
-   		dcThread.start();
-   		
-   		try {
-   			// wait until directory is loaded
-   			synchronized(dc.initMonitor) {
-   				dc.initMonitor.wait();
-   			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-   		
-		/*Start ringer server
-		
-		//Intent rsIntent = new Intent(this, RingerServer.class);
-		//startService(rsIntent);
-		
-        final Button buttonCall = (Button) findViewById(R.id.ButtonCall);
-        buttonCall.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-            	// Switch to outgoing call activity
-                Intent callOutgoingIntent = new Intent(v.getContext(), ActivityCallOutgoing.class);
-                startActivityForResult(callOutgoingIntent, 0);
-            }
-        });   */     
-    }
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+	    	dc.logout();
+	    }
 
+	    return super.onKeyDown(keyCode, event);
+	}
+	
 	@Override
     public void onResume() {
     	super.onResume();
