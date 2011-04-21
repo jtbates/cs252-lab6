@@ -1,6 +1,8 @@
 package edu.purdue.cs252.lab6;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 	private String userIP; //String Containing the userIP
 	private String userName; //String containing the username 
 	private boolean isConnected; //Boolean value which determines if the user is currently connected to another phone 
@@ -46,6 +48,15 @@ public class User {
 	public String getUserIp() {
 		return userIP;
 	}
+
+	public String connectionStatus() {
+		return isConnected?"Online":"Offline";
+		
+	}
+	
+	public boolean isConnected() {
+		return isConnected;
+	}
 	
 	/*
 	* Summary:     Toggles the value of isConnected to from true to false, and false to true
@@ -54,5 +65,9 @@ public class User {
 	*/
 	public void changeConnection() {
 		isConnected = !isConnected;
+	}
+
+	public String toString() {
+		return userName;
 	}
 }

@@ -1,19 +1,16 @@
 package edu.purdue.cs252.lab6.userapp;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import android.app.Activity;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+import edu.purdue.cs252.lab6.User;
 
 public class RingerServer extends Service {
 	public static final String ACTION_INCOMINGCALL = "edu.purdue.cs252.lab6.ACTION_INCOMINGCALL";
@@ -37,29 +34,40 @@ public class RingerServer extends Service {
 						Log.d("TCP", "RS: New connection received.");
 
 						// Read data from the client
-						InputStream stream = clientSocket.getInputStream();
-						// InputStream is an abstract class. We needed to use a subclass
-						BufferedReader data = new BufferedReader(new InputStreamReader(stream));
-
-						// Read a line at a time
-						String line;
-						while ((line = data.readLine()) != null) {
-							Log.d("TCP", "RS: Received: '" + line + "'");
+						
+						ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
+						ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+						
+						Call.State cs = (Call.State) ois.readObject();
+						
+						if(cs == Call.State.OUTGOING)
+						{
+							if(Call.getState() == Call.State.IDLE)
+							{
+								User u = (User)ois.readObject();
+								// Set call state
+								Call.setState(Call.State.INCOMING);
+								
+								// Send broadcast
+								Intent intentIncomingCall = new Intent(ACTION_INCOMINGCALL);
+								intentIncomingCall.putExtra("USER", u);
+								sendBroadcast(intentIncomingCall);
+							}
 						}
+							
+						
 						Log.d("TCP", "RS: Done.");
 
-						// Set call state
-						Call.setState(Call.State.INCOMING);
 						
-						// Send broadcast
-						Intent intentIncomingCall = new Intent(ACTION_INCOMINGCALL);
-						sendBroadcast(intentIncomingCall);
 
 					} while (true);
 					
 
 				} catch (IOException e) {
 					System.out.println("TCP S: Error" + e);
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} 
 			}	
 		};

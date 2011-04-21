@@ -3,21 +3,27 @@ package edu.purdue.cs252.lab6.userapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import edu.purdue.cs252.lab6.User;
 
 public class ActivityCallOutgoing extends Activity {
     /** Called when the activity is first created. */
+	
+	User usr;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_outgoing);
+        Bundle extras = getIntent().getExtras();
+        
+        final User usr = (User)extras.get("USER");
+        
+        
         // TODO: cancel button
         
         try {
         	// Attempt connection to ringer server 
-        	Thread ringing = new Thread(new RingerClient());
+        	Thread ringing = new Thread(new RingerClient(usr));
         	ringing.start();
         	
         	ringing.join();        	

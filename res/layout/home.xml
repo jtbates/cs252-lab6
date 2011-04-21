@@ -5,7 +5,7 @@
     android:layout_gravity="center" android:orientation="vertical">
 
 <TextView android:text="Server" android:id="@+id/TextViewServer" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
-<EditText android:text="10.0.2.2" android:id="@+id/EditTextServer" android:layout_height="wrap_content" android:layout_width="match_parent"></EditText>
+<EditText android:text="192.168.1.104" android:id="@+id/EditTextServer" android:layout_height="wrap_content" android:layout_width="match_parent"></EditText>
 <TextView android:text="Username" android:id="@+id/TextViewUser" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 <EditText android:text="" android:id="@+id/EditTextUser" android:layout_height="wrap_content" android:layout_width="match_parent"></EditText>
 <Button android:text="Sign in" android:id="@+id/ButtonSignIn" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center"></Button>

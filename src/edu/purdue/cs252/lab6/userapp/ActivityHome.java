@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class ActivityHome extends Activity {
-	
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,22 +22,22 @@ public class ActivityHome extends Activity {
         
         buttonSignIn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-            	// Set directory server
-            	DirectoryClient.SERVERNAME = editTextServer.getText().toString();
-            	System.out.println(DirectoryClient.SERVERNAME);
-            	
-            	
-            	//Switch Statement added in case multiple buttons are added to the original screen
-            	switch (v.getId()) {
-            		case R.id.ButtonSignIn:
-            			String username;
-            			username = editTextUser.getText().toString();
-            			Intent directoryIntent = new Intent(v.getContext(), ActivityDirectory.class);
-            			directoryIntent.putExtra("USER", username);
-            			startActivity(directoryIntent);
-            			break;
-            	}
-            	
+             // Set directory server
+             DirectoryClient.SERVERNAME = editTextServer.getText().toString();
+             System.out.println(DirectoryClient.SERVERNAME);
+            
+            
+             //Switch Statement added in case multiple buttons are added to the original screen
+             switch (v.getId()) {
+             case R.id.ButtonSignIn:
+             String username;
+             username = editTextUser.getText().toString();
+             Intent directoryIntent = new Intent(v.getContext(), ActivityDirectory.class);
+             directoryIntent.putExtra("USER", username);
+             startActivity(directoryIntent);
+             break;
+             }
+            
                
             }
         });

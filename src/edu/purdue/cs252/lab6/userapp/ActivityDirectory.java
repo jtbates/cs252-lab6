@@ -1,9 +1,5 @@
 package edu.purdue.cs252.lab6.userapp;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import edu.purdue.cs252.lab6.User;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -16,10 +12,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.view.View.OnClickListener;
+import edu.purdue.cs252.lab6.User;
 
 
 /*
@@ -30,17 +25,23 @@ public class ActivityDirectory extends ListActivity {
 	public static final int RESULT_INTERRUPTED = 1;
 	public static final int RESULT_FAILED = 2;
 	
+	DirectoryClient dc = null;
+	static User selected = null;
+	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
+		
+		final View view = v;
 
 		//Get the last item that was clicked and store it into keyword
 		Object o = this.getListAdapter().getItem(position);
-		String keyword = o.toString();
+		//String keyword = o.toString();
+		selected = (User)o;
 		
 		//Build the Alert Box
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Are you sure you want to connect to " + keyword + "?")
+		builder.setMessage("Are you sure you want to connect to " + selected + "?\nIP Address: " + selected.getUserIp() + "\nStatus: " + selected.connectionStatus())
 		       .setCancelable(false)
 		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 		    	   //Clicking Yes on the dialog box
@@ -48,6 +49,9 @@ public class ActivityDirectory extends ListActivity {
 		    		   //TODO : implement the connect to the next user
 		    		   //Write to log to check if it is working
 		    		   Log.d("Connect", "to the next user");
+		    		   Intent callOutgoingIntent = new Intent(view.getContext(), ActivityCallOutgoing.class);
+		    		   callOutgoingIntent.putExtra("USER", selected);
+		    	       startActivity(callOutgoingIntent);
 		           }
 		       })
 		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -68,24 +72,19 @@ public class ActivityDirectory extends ListActivity {
         super.onCreate(savedInstanceState);
         Bundle extras = getIntent().getExtras();
         
-        //Temp user list stored
-        String[] names = new String[] { "User 1", "User 2", "User 3", "User 4"};
-		// Create an ArrayAdapter, that will actually make the Strings above
-		// appear in the ListView
-		this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names));
-    
-        //Get the username sent from the previous activity
         String userName = "";
         if (this.getIntent().getExtras() != null) {
         	userName = extras.getString("USER");
+        
+        	
         }
+        
+        try {
+    		dc = new DirectoryClient(userName);
+    	} catch(Exception e) {}
+        
         Log.d("Login", userName);
-        
-        
-        // Start the directory client
-       	DirectoryClient dc = new DirectoryClient(userName);
-   		Thread dcThread = new Thread(dc);
-   		dcThread.start();
+   
    		
    		try {
    			// wait until directory is loaded
@@ -97,13 +96,17 @@ public class ActivityDirectory extends ListActivity {
 			e.printStackTrace();
 		}
 		
+		// Create an ArrayAdapter, that will actually make the Strings above
+		// appear in the ListView
+		this.setListAdapter(new ArrayAdapter<User>(this, R.layout.directory, R.id.user, dc.userList));
+    
 		
    		
-		/*Start ringer server
+		//Start ringer server
 		
-		//Intent rsIntent = new Intent(this, RingerServer.class);
-		//startService(rsIntent);
-		
+		Intent rsIntent = new Intent(this, RingerServer.class);
+		startService(rsIntent);
+		/*
         final Button buttonCall = (Button) findViewById(R.id.ButtonCall);
         buttonCall.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -134,8 +137,12 @@ public class ActivityDirectory extends ListActivity {
 
     	@Override
     	public void onReceive(Context context, Intent intent) {
+    		Bundle extras = intent.getExtras();
+    		final User usr = (User)extras.get("USER");
+    		
         	// Switch to incoming call activity
         	Intent callIncomingIntent = new Intent(context,ActivityCallIncoming.class);
+        	callIncomingIntent.putExtra("USER", usr);
         	((Activity) context).startActivityForResult(callIncomingIntent,0);
     	}
 

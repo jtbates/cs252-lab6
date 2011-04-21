@@ -1,6 +1,10 @@
 package edu.purdue.cs252.lab6;
 
 public enum DirectoryCommand {
+	
+	C_WAITING(0x01),
+	C_REFRESH(0x02),
+	
 	// commands that the client sends to the server
 	C_LOGIN(0x10), // logs the user in; argument is the client's User class
 	C_LOGOUT(0x11), // no argument
