@@ -24,7 +24,7 @@ import android.os.Message;
 import android.util.Log;
 
 public class DirectoryClient {
-	//private String server;
+	private String server;
 	//private int port = DirectoryServer.SERVERPORT;
 	private User user;
 	
@@ -45,7 +45,7 @@ public class DirectoryClient {
 	*/   
 	public DirectoryClient(String server, User user, Handler readHandler)
 			throws UnknownHostException, IOException {
-		//this.server = server;
+		this.server = server;
 		this.user = user;
 		
 		InetAddress serverAddr = InetAddress.getByName(server);
@@ -76,6 +76,16 @@ public class DirectoryClient {
 			}
 		}
 		Log.i("DC","Finished constructor");
+	}
+	
+	/*
+	 * Summary:		Returns the server string 
+	 * Parameters:	none
+	 * Return:		String server
+	 */
+	
+	public String getServer() {
+		return server;
 	}
 	
 	/*
@@ -159,6 +169,7 @@ public class DirectoryClient {
 					DirectoryCommand command = (DirectoryCommand)ois.readObject();
 					Log.i("DC","Command: " + command.toString());
 					Message msg = readHandler.obtainMessage();
+					String username;
 					switch(command) {
 						case S_STATUS_OK:
 							DirectoryCommand okCmd = (DirectoryCommand) ois.readObject();
@@ -182,17 +193,30 @@ public class DirectoryClient {
 						case S_BC_USERLOGGEDOUT:
 							Object obj = ois.readObject();
 							Log.i("DC",obj.toString() + " logged out");
-							String username = (String)obj;
+							username = (String)obj;
 							msg.what = DirectoryCommand.S_BC_USERLOGGEDOUT.getCode();
 							msg.obj = username;
 							readHandler.sendMessage(msg);
 							Log.i("DC",username + " logged out");
 							break;
 						case S_CALL_INCOMING:
-							String caller_username = (String)ois.readObject();
-							Log.i("DC","Incoming call from " + caller_username);
+							username = (String)ois.readObject();
+							Log.i("DC","Incoming call from " + username);
 							msg.what = DirectoryCommand.S_CALL_INCOMING.getCode();
-							msg.obj = caller_username;
+							msg.obj = username;
+							readHandler.sendMessage(msg);
+							break;
+						case S_REDIRECT_INIT:
+							int port = ois.readInt();
+							Log.i("DC","S_REDIRECT_INIT");
+							msg.what = DirectoryCommand.S_REDIRECT_INIT.getCode();
+							msg.arg1 = port;
+							readHandler.sendMessage(msg);
+							break;
+						case S_REDIRECT_READY:
+							Log.i("DC","S_REDIRECT_READY");
+							username = (String)ois.readObject();
+							msg.what = DirectoryCommand.S_CALL_INCOMING.getCode();
 							readHandler.sendMessage(msg);
 							break;
 						default:
@@ -211,24 +235,24 @@ public class DirectoryClient {
 			public void run() {
 				try {
 					synchronized(socket) {
-						Log.i("TCP","C: login write begin...");
+						Log.i("DC","login write begin...");
 
 						oos.writeObject(DirectoryCommand.C_LOGIN);
 						oos.writeObject(user);
 						oos.flush();
-						Log.i("TCP","C: login write finish");
+						Log.i("DC","login write finish");
 
 					}
 				}
 				catch(IOException e) {
-					Log.e("TCP", "C: Write error, login failed");
+					Log.e("DC", "Write error, login failed");
 				}
 			}
 		});
 	}
 	
 	public void getDirectory() {
-		Log.i("DC","C: Getting directory...");
+		Log.i("DC","Getting directory...");
 		writeHandler.post(new Runnable() {
 			public void run() {
 				try {
@@ -247,7 +271,7 @@ public class DirectoryClient {
 	}
 
 	public void call_attempt(final String username2) {
-		Log.i("DC","Calling " + username2);
+		Log.i("DC","call attempt to " + username2);
 		writeHandler.post(new Runnable() {
 			public void run() {
 				try {
@@ -255,12 +279,49 @@ public class DirectoryClient {
 						oos.writeObject(DirectoryCommand.C_CALL_ATTEMPT);
 						oos.writeObject(username2);
 						oos.flush();
-						Log.i("DC","get directory write finish");
+						Log.i("DC","call attempt write finish");
+					}
+				}
+				catch(IOException e) {
+					Log.e("DC", "Write error, call attempt failed");
+				}
+			}
+		});		
+	}
+	
+	public void call_answer(final String username2) {
+		Log.i("DC","answering call from " + username2);
+		writeHandler.post(new Runnable() {
+			public void run() {
+				try {
+					synchronized(socket) {
+						oos.writeObject(DirectoryCommand.C_CALL_ANSWER);
+						oos.writeObject(username2);
+						oos.flush();
+						Log.i("DC","call answer write finish");
 
 					}
 				}
 				catch(IOException e) {
-					Log.e("DC", "Write error, get directory failed");
+					Log.e("DC", "Write error, call answer failed");
+				}
+			}
+		});		
+	}
+	
+	public void call_ready() {
+		Log.i("DC","call_ready write");
+		writeHandler.post(new Runnable() {
+			public void run() {
+				try {
+					synchronized(socket) {
+						oos.writeObject(DirectoryCommand.C_CALL_READY);
+						oos.flush();
+						Log.i("DC","call_ready write finish");
+					}
+				}
+				catch(IOException e) {
+					Log.e("DC", "Write error, call_ready write failed");
 				}
 			}
 		});		

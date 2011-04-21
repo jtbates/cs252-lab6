@@ -8,7 +8,7 @@ public enum DirectoryCommand {
 	C_CALL_ATTEMPT(0x13), // argument is the username of the call recipient (String)
 	C_CALL_ANSWER(0x14), // argument is the username of the caller (String)
 	C_CALL_HANGUP(0x15), // disconnects from the call; no argument
-	C_CALL_READY(0x16), // client is connected to redirect port and awaiting communication 
+	C_CALL_READY(0x16), // client is connected to redirect port and awaiting communication; no argument 
 	
 	// commands the server sends to a client 
 	S_CALL_INCOMING(0x20), // another user is make an incoming call; argument is the caller's username (String)

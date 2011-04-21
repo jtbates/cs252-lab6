@@ -9,9 +9,17 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-public class VoiceCaptureClient implements Runnable {
+public class VoiceCaptureClient extends Thread {
 	static public String SERVERNAME = "10.0.2.2";
 	static public int SERVERPORT = 25203;
+	private String server;
+	private int port;
+	
+	VoiceCaptureClient(String server, int port) {
+		super();
+		this.server = server;
+		this.port = port;
+	}
 	
 	public void run() {
 		try {
@@ -29,7 +37,7 @@ public class VoiceCaptureClient implements Runnable {
 			// Array of bytes length minSize
 			byte[] buf = new byte[minSize];
 			// While call has not ended
-			while (ongoing) {
+			while (!isInterrupted()) {
 				
 				//Read data from mic into buf
 				data.read(buf,0,minSize);

@@ -183,6 +183,7 @@ public class DirectoryServer {
 		}
 		
 		private void call_attempt(String username2) throws IOException {
+			System.out.println(username + " is attempting to call " + username2);
 			Client client2 = clientMap.get(username2);
 			if(client2 == null) {
 				synchronized(oos) {
@@ -205,7 +206,7 @@ public class DirectoryServer {
 				}
 			}
 			else {
-				Call call = new Call(username,username2);
+				call = new Call(username,username2);
 				callMap.put(username, call);
 
 				client2.call_accepted(username);
@@ -294,7 +295,7 @@ public class DirectoryServer {
 		}
 
 		public void call_accepted(String username2) throws IOException {
-			Call call = callMap.get(username2);
+			call = callMap.get(username2);
 			if(call == null) {
 				synchronized(oos) {
 					oos.writeObject(DirectoryCommand.S_ERROR_CALLFAILED);
@@ -325,6 +326,7 @@ public class DirectoryServer {
 		}
 		
 		public void call_beginSending(String username2) throws IOException {
+			System.out.println("S_REDIRECT_READY to " + username2);
 			synchronized(oos) {
 				oos.writeObject(DirectoryCommand.S_REDIRECT_READY);
 				oos.writeObject(username2);
@@ -377,6 +379,10 @@ public class DirectoryServer {
 		//ArrayList<InetAddress> groupList;
 		
 		Call(String username1, String username2) throws IOException {
+			idMap = new HashMap<String,Integer>();
+			usernameList = new ArrayList<String>();
+			socketList = new ArrayList<MulticastSocket>();
+			threadList = new ArrayList<Thread>();
 			connect(username1);
 			connect(username2);
 		}
@@ -393,6 +399,7 @@ public class DirectoryServer {
 		
 		synchronized void connect(String username) throws IOException {
 			final int id = usernameList.size();
+			idMap.put(username, id);
 			usernameList.add(username);
 			final MulticastSocket redirectFromSocket = new MulticastSocket();
 			socketList.add(redirectFromSocket);
@@ -439,11 +446,17 @@ public class DirectoryServer {
 					String username = usernameList.get(i);
 					Client client = clientMap.get(username);
 					client.call_disconnect(user_disconnecting);
+					if(i>id) {
+						idMap.put(username, i-1);
+					}
 				}
 			}
 			
+			usernameList.remove(id);
 			socket.close();
+			socketList.remove(id);
 			thread.interrupt();
+			threadList.remove(id);
 			
 			Client client_disconnecting = clientMap.get(user_disconnecting);
 			client_disconnecting.success(DirectoryCommand.C_CALL_HANGUP);			

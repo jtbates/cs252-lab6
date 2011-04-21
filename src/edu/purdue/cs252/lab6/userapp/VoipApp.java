@@ -9,6 +9,8 @@ import android.content.SharedPreferences;
 public class VoipApp extends Application {
 	private User user;
 	private DirectoryClient directoryClient;
+	private VoicePlayerServer voicePlayerServer;
+	private VoiceCaptureClient voiceCaptureClient;
 	//private SharedPreferences prefs;
 	//private SharedPreferences.Editor editor;
 	public HashMap userMap;
@@ -29,5 +31,17 @@ public class VoipApp extends Application {
 	}
 	public DirectoryClient getDirectoryClient() {
 		return directoryClient;
+	}
+	public void setVoicePlayerServer(VoicePlayerServer vps) {
+		this.voicePlayerServer = vps;
+	}
+	public VoicePlayerServer getVoicePlayerServer() {
+		return voicePlayerServer;
+	}
+	public void setVoiceCaptureClient(VoiceCaptureClient vcc) {
+		this.voiceCaptureClient = vcc;
+	}
+	public VoiceCaptureClient getVoiceCaptureClient() {
+		return voiceCaptureClient;
 	}
 }

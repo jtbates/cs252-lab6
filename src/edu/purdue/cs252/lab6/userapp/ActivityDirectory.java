@@ -57,7 +57,7 @@ public class ActivityDirectory extends ListActivity {
        	final ListActivity thisActivity = this;
 		thisActivity.setListAdapter(adapter);
 		
-        // Start the directory client
+        // get the directory client 
        	dc = appState.getDirectoryClient();
        	Handler handler = new Handler() {
        		public void handleMessage(Message msg) {
@@ -86,7 +86,7 @@ public class ActivityDirectory extends ListActivity {
    	       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
    	       			String username2 = (String)msg.obj;
    	       			Intent callIncomingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallIncoming.class);
-   	       			callIncomingIntent.putExtra("calling_username",username2);
+   	       			callIncomingIntent.putExtra("username2",username2);
    	       			startActivity(callIncomingIntent);
    	       		}
    	       		else {
@@ -124,16 +124,16 @@ public class ActivityDirectory extends ListActivity {
 	* Return: 		void
 	*/   
 	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-
+	protected void onListItemClick(ListView l, View view, int position, long id) {
+		super.onListItemClick(l, view, position, id);
+		final View v = view;
 		//Get the last item that was clicked and store it into keyword
 		Object o = this.getListAdapter().getItem(position);
-		String calling_username = o.toString();
+		final String username2 = o.toString();
 		
 		//Build the Alert Box
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Are you sure you want to connect to " + calling_username + "?")
+		builder.setMessage("Are you sure you want to connect to " + username2 + "?")
 		       .setCancelable(false)
 		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 		    	   //Clicking Yes on the dialog box
@@ -141,6 +141,9 @@ public class ActivityDirectory extends ListActivity {
 		    		   //TODO : implement the connect to the next user
 		    		   //Write to log to check if it is working
 		    		   Log.d("Connect", "to the next user");
+		    		   Intent callOutgoingIntent = new Intent(v.getContext(), ActivityCallOutgoing.class);
+		    		   callOutgoingIntent.putExtra("username2",username2);
+		    		   startActivity(callOutgoingIntent);
 		           }
 		       })
 		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -181,7 +184,7 @@ public class ActivityDirectory extends ListActivity {
     
     
     
-    private class IncomingCallReceiver extends BroadcastReceiver {
+    /*private class IncomingCallReceiver extends BroadcastReceiver {
 
     	@Override
     	public void onReceive(Context context, Intent intent) {
@@ -190,5 +193,5 @@ public class ActivityDirectory extends ListActivity {
         	((Activity) context).startActivityForResult(callIncomingIntent,0);
     	}
 
-    }
+    }*/
 }

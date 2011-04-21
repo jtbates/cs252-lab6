@@ -31,10 +31,10 @@ public class RingerClient implements Runnable {
 			Log.d("TCP", "C: Done.");
 
 			// Start the voice player server
-        	new Thread(new VoicePlayerServer()).start();
+        	//new Thread(new VoicePlayerServer()).start();
 			
         	// Start voice capture client
-        	new Thread(new VoiceCaptureClient()).start();
+        	//new Thread(new VoiceCaptureClient()).start();
 			
         	// Close the connection
 			clientSocket.close();

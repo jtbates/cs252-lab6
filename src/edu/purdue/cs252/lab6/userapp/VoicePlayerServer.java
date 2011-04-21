@@ -9,10 +9,18 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.util.Log;
 
-public class VoicePlayerServer implements Runnable {
+public class VoicePlayerServer extends Thread {
 	static public String SERVERNAME = "10.0.2.2";
 	static public int SERVERPORT = 25203;
-
+	private String server;
+	private int port;
+	
+	VoicePlayerServer(String server, int port) {
+		super();
+		this.server = server;
+		this.port = port;
+	}
+	
 	public void run() {
 		try {
 			boolean ongoing=true;
@@ -27,7 +35,7 @@ public class VoicePlayerServer implements Runnable {
 			AudioTrack data= new AudioTrack(AudioManager.STREAM_VOICE_CALL,44100,AudioFormat.CHANNEL_OUT_STEREO,AudioFormat.ENCODING_PCM_16BIT,minSize,AudioTrack.MODE_STATIC);
 			byte[] buf=new byte[minSize];
 			
-			while (ongoing) {
+			while (!isInterrupted()) {
 				//Define the packet
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
 				
