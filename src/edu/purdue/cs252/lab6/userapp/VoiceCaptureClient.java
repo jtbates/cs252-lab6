@@ -23,7 +23,8 @@ public class VoiceCaptureClient extends Thread {
 	
 	public void run() {
 		try {
-			// Minimum buffer size (can be increased later)
+			Log.i("VCC", "run");
+			/*// Minimum buffer size (can be increased later)
 			int minSize=AudioRecord.getMinBufferSize(4410,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT);
 			// Construct instance of AudioRecord
 			AudioRecord data=new AudioRecord(MediaRecorder.AudioSource.VOICE_CALL,44100,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT,minSize);
@@ -46,29 +47,29 @@ public class VoiceCaptureClient extends Thread {
 				
 				//Send the packet
 				socket.send(packet);
-			}
+			}*/
 			
-			/*
+			
 			// Retrieve the ServerName
-			InetAddress serverAddr = InetAddress.getByName(SERVERNAME);
+			InetAddress serverAddr = InetAddress.getByName(server);
 
-			Log.d("UDP", "C: Connecting...");
+			Log.i("UDP", "VCC: Connecting to " + server + " on " + port + "...");
 			// Create new UDP-Socket 
 			DatagramSocket socket = new DatagramSocket();
 			
-			/* Prepare some data to be sent. 
+			// Prepare some data to be sent. 
 			byte[] buf = ("Hello from VoiceCaptureClient").getBytes();
 
-			/* Create UDP-packet with
-			 * data & destination(url+port) 
-			DatagramPacket packet = new DatagramPacket(buf, buf.length, serverAddr, SERVERPORT);
-			Log.d("UDP", "C: Sending: '" + new String(buf) + "'");
+			// Create UDP-packet with
+			// data & destination(url+port) 
+			DatagramPacket packet = new DatagramPacket(buf, buf.length, serverAddr, port);
+			Log.i("UDP", "C: Sending: '" + new String(buf) + "'");
 
-			/* Send out the packet 
+			// Send out the packet 
 			socket.send(packet);
-			Log.d("UDP", "C: Sent.");
-			Log.d("UDP", "C: Done.");
-			*/
+			Log.i("UDP", "C: Sent.");
+			Log.i("UDP", "C: Done.");
+			
 		} catch (Exception e) {
 			Log.e("UDP", "C: Error", e);
 		}

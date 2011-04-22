@@ -26,7 +26,10 @@ public class ActivityHome extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
         
-        final VoipApp appState = (VoipApp) getApplicationContext(); 
+        // global state
+        final VoipApp appState = (VoipApp) getApplicationContext();
+        // set call state to idle
+        Call.setState(Call.State.IDLE);
         
         final EditText editTextUser = (EditText) findViewById(R.id.EditTextUser);
         final EditText editTextServer = (EditText) findViewById(R.id.EditTextServer);

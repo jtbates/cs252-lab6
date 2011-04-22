@@ -19,8 +19,7 @@ public class ActivityCallIncoming extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_incoming);
         
-        Bundle extras = getIntent().getExtras();
-        final String username2 = extras.getString("username2");
+        final String username2 = Call.getUsername2();
         
         final TextView textWhosCalling = (TextView)findViewById(R.id.TextWhosCalling);
         textWhosCalling.setText(username2 + " is calling");
@@ -33,34 +32,28 @@ public class ActivityCallIncoming extends Activity {
        	
        	final String server = dc.getServer();
        	
-       	Handler aciHandler = new Handler() {
-       		int port;
+       	Handler callIncomingHandler = new Handler() {
        		public void handleMessage(Message msg) {
-       			Log.i("ACI","aciHandler");
+       			Log.i("ACIncoming","callIncomingHandler");
    	       		if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
    	       			// ignore
    	       		}
    	       		else if(msg.what == DirectoryCommand.S_REDIRECT_INIT.getCode()) {
-   	       			port = msg.arg1;
+   	       			int port = msg.arg1;
+   	       			Call.setPort(port);
    	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
    	       			voicePlayerServer.start();
-   	       			dc.call_ready();
-   	       		}
-   	       		else if(msg.what == DirectoryCommand.S_REDIRECT_READY.getCode()) {
-   	       			VoiceCaptureClient voiceCaptureClient = new VoiceCaptureClient(server,port);
-   	       			voiceCaptureClient.start();
-   	       			
    	       			Intent callOngoingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallOngoing.class);
    	       			startActivityForResult(callOngoingIntent, 0);
    	       		}
    	       		else {
-   	       			Log.e("ACI","unrecognized message " + msg.what + " " + msg.obj.toString());
+   	       			Log.e("ACIncoming","unrecognized message " + msg.what + " " + msg.obj.toString());
    	       			// unrecognized message
    	       			// TODO: handle error
    	       		}
        		}
        	};
-        dc.setReadHandler(aciHandler);
+        dc.setReadHandler(callIncomingHandler);
         
         final Button buttonCallAnswer = (Button) findViewById(R.id.ButtonCallAnswer);
         buttonCallAnswer.setOnClickListener(new OnClickListener() {

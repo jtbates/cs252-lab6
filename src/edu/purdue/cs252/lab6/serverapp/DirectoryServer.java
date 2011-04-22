@@ -155,11 +155,14 @@ public class DirectoryServer {
 									break;
 								case C_CALL_READY:
 									call_ready();
+									break;
 								case C_CALL_HANGUP:
 									call_hangup();
+									break;
 								default:
 									// error, unrecognized command
-									throw new IOException("Unrecognized command: " + command.getCode());
+									System.out.println("Unrecognized command " + command.toString());
+									//throw new IOException("Unrecognized command: " + command.toString());
 							}
 						}
 						catch(EOFException e) {
@@ -198,6 +201,7 @@ public class DirectoryServer {
 		}
 		
 		private void call_answer(String username2) throws IOException {
+			System.out.println(username + " answers " + username2);
 			Client client2 = clientMap.get(username2);
 			if(client2 == null) {
 				synchronized(oos) {
@@ -213,8 +217,10 @@ public class DirectoryServer {
 				
 				synchronized(oos) {
 					oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
-					oos.writeInt(call.getPort(username));
+					int port = call.getPort(username);
+					oos.writeInt(port);
 					oos.flush();
+					System.out.println("S_REDIRECT_INIT " + port + " to " + username);
 				}
 			}
 		}
@@ -295,6 +301,7 @@ public class DirectoryServer {
 		}
 
 		public void call_accepted(String username2) throws IOException {
+			System.out.println(username + "'s call is accepted by " + username2);
 			call = callMap.get(username2);
 			if(call == null) {
 				synchronized(oos) {
@@ -311,8 +318,10 @@ public class DirectoryServer {
 
 				synchronized(oos) {
 					oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
-					oos.writeInt(call.getPort(username));
+					int port = call.getPort(username);
+					oos.writeInt(port);
 					oos.flush();
+					System.out.println("S_REDIRECT_INIT " + port + " to " + username);
 				}
 			}
 		}
@@ -335,13 +344,13 @@ public class DirectoryServer {
 		}
 
 		public void success(DirectoryCommand command) throws IOException {
-			System.out.println("Login success write begin");
+			System.out.println("success write " + command.toString() + " begin");
 			synchronized(oos) {
 				oos.writeObject(DirectoryCommand.S_STATUS_OK);
 				oos.writeObject(command);
 				oos.flush();
 			}
-			System.out.println("Login success write complete");
+			System.out.println("success write complete");
 		}
 	
 		public void user_loggedin(User user_loggedin) throws IOException {
@@ -374,21 +383,20 @@ public class DirectoryServer {
 	private class Call {
 		HashMap<String,Integer> idMap;
 		ArrayList<String> usernameList;
-		ArrayList<MulticastSocket> socketList;
-		ArrayList<Thread> threadList;
-		//ArrayList<InetAddress> groupList;
+		ArrayList<DatagramSocket> socketList;
+		//ArrayList<Thread> threadList;
 		
 		Call(String username1, String username2) throws IOException {
 			idMap = new HashMap<String,Integer>();
 			usernameList = new ArrayList<String>();
-			socketList = new ArrayList<MulticastSocket>();
-			threadList = new ArrayList<Thread>();
+			socketList = new ArrayList<DatagramSocket>();
+			//threadList = new ArrayList<Thread>();
 			connect(username1);
 			connect(username2);
 		}
 		
 		int getPort(String username) {
-			MulticastSocket redirect = socketList.get(idMap.get(username));
+			DatagramSocket redirect = socketList.get(idMap.get(username));
 			if(redirect == null) return -1;
 			else return redirect.getLocalPort();
 		}
@@ -401,28 +409,26 @@ public class DirectoryServer {
 			final int id = usernameList.size();
 			idMap.put(username, id);
 			usernameList.add(username);
-			final MulticastSocket redirectFromSocket = new MulticastSocket();
+			final DatagramSocket redirectFromSocket = new DatagramSocket();
 			socketList.add(redirectFromSocket);
-			//InetAddress group = InetAddress.getByName("230.0.0." + (id+1));
-			//groupList.add(group);
-			// forget multicast for now, maybe implement later
 			
 			Thread redirectThread = new Thread() {
 				@Override
 				public void run() {
-					int minSize = 100; // need to decide this
+					int minSize = 17; // need to decide this
 					byte[] buf=new byte[minSize];
 
 					while (!isInterrupted()) {
 						try {
 							DatagramPacket packet = new DatagramPacket(buf, buf.length);
 							redirectFromSocket.receive(packet);
-							for(int i=0; i<usernameList.size();i++) {
+							System.out.println("Received UDP packet " + packet.toString());
+							/*for(int i=0; i<usernameList.size();i++) {
 								if(i != id) {
 									DatagramSocket redirectToSocket = socketList.get(i);
 									redirectToSocket.send(packet);
 								}
-							}
+							}*/
 						}
 						catch (IOException e) {
 							System.out.println("UDP S: Error" + e);
@@ -431,14 +437,14 @@ public class DirectoryServer {
 					}
 				}
 			};
-			threadList.add(redirectThread);
+			//threadList.add(redirectThread);
 			redirectThread.start();
 		}
 		
 		synchronized void disconnect(String user_disconnecting) throws IOException {
 			int id = idMap.get(user_disconnecting);
-			MulticastSocket socket = socketList.get(id);
-			Thread thread = threadList.get(id);
+			DatagramSocket socket = socketList.get(id);
+			//Thread thread = threadList.get(id);
 			
 			
 			for(int i=0;i<usernameList.size();i++) {
@@ -455,8 +461,8 @@ public class DirectoryServer {
 			usernameList.remove(id);
 			socket.close();
 			socketList.remove(id);
-			thread.interrupt();
-			threadList.remove(id);
+			//thread.interrupt();
+			//threadList.remove(id);
 			
 			Client client_disconnecting = clientMap.get(user_disconnecting);
 			client_disconnecting.success(DirectoryCommand.C_CALL_HANGUP);			

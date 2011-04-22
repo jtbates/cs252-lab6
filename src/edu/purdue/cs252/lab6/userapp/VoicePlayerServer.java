@@ -23,7 +23,7 @@ public class VoicePlayerServer extends Thread {
 	
 	public void run() {
 		try {
-			boolean ongoing=true;
+			/*boolean ongoing=true;
 			
 			InetAddress serverAddr = InetAddress.getByName(SERVERNAME);
 			DatagramSocket socket = new DatagramSocket(SERVERPORT);
@@ -45,30 +45,30 @@ public class VoicePlayerServer extends Thread {
 				// Read packet data and write to a speaker
 				buf=packet.getData();
 				data.write(buf,0,minSize);
-			}
-			/*
+			}*/
 			
-			/* Retrieve the ServerName 
-			InetAddress serverAddr = InetAddress.getByName(SERVERNAME);
+			
+			// Retrieve the ServerName 
+			InetAddress serverAddr = InetAddress.getByName(server);
 
-			Log.d("UDP", "VPS: Connecting...");
-			/* Create new UDP-Socket 
+			Log.i("UDP", "VPS: Connecting...");
+			// Create new UDP-Socket 
 			//DatagramSocket socket = new DatagramSocket(SERVERPORT, serverAddr);
-			DatagramSocket socket = new DatagramSocket(SERVERPORT);
+			DatagramSocket socket = new DatagramSocket(port, serverAddr);
 			
-			/* By magic we know, how much data will be waiting for us 
+			// By magic we know, how much data will be waiting for us 
 			byte[] buf = new byte[17];
-			/* Prepare a UDP-Packet that can
-			 * contain the data we want to receive 
+			// Prepare a UDP-Packet that can
+			// contain the data we want to receive 
 			DatagramPacket packet = new DatagramPacket(buf, buf.length);
-			Log.d("UDP", "VPS: Receiving...");
+			Log.i("UDP", "VPS: Receiving...");
 
-			/* Receive the UDP-Packet 
+			// Receive the UDP-Packet 
 			socket.receive(packet);
-			Log.d("UDP", "VPS: Received: '" + new String(packet.getData()) + "'");
-			Log.d("UDP", "VPS: Done.");
+			Log.i("UDP", "VPS: Received: '" + new String(packet.getData()) + "'");
+			Log.i("UDP", "VPS: Done.");
 			
-			*/
+			
 		} catch (Exception e) {
 			Log.e("UDP", "VPS: Error", e);
 		}

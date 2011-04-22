@@ -18,18 +18,30 @@ public class ActivityCallOutgoing extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_outgoing);
+
         
-        Bundle extras = getIntent().getExtras();
-        String username2 = extras.getString("username2");
         
-        final VoipApp appState = (VoipApp) getApplicationContext(); 
+        
+        final VoipApp appState = (VoipApp) getApplicationContext();
+       	final Activity thisActivity = ActivityCallOutgoing.this;
         // get the directory client 
-       	DirectoryClient dc = appState.getDirectoryClient();
-       	Handler acoHandler = new Handler() {
+       	final DirectoryClient dc = appState.getDirectoryClient();
+       	final String server = dc.getServer();
+       	String username2 = Call.getUsername2();
+       	
+       	Handler callOutgoingHandler = new Handler() {
        		public void handleMessage(Message msg) {
        			Log.i("ACO","acoHandler");
    	       		if(msg.what == DirectoryCommand.S_CALL_ACCEPTED.getCode()) {
    	       			Log.i("ACO","call accepted");
+   	       		}
+   	       		else if(msg.what == DirectoryCommand.S_REDIRECT_INIT.getCode()) {
+   	       			int port = msg.arg1;
+   	       			Call.setPort(port);
+   	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
+   	       			voicePlayerServer.start();
+   	       			Intent callOngoingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallOngoing.class);
+   	       			startActivityForResult(callOngoingIntent, 0);	
    	       		}
    	       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
    	       			// ignore
@@ -42,7 +54,7 @@ public class ActivityCallOutgoing extends Activity {
    	       		}
        		}
        	};
-        dc.setReadHandler(acoHandler);
+        dc.setReadHandler(callOutgoingHandler);
        	dc.call_attempt(username2);
         
         final TextView textCallingWhom = (TextView)findViewById(R.id.TextCallingWhom);

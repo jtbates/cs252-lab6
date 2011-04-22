@@ -206,6 +206,13 @@ public class DirectoryClient {
 							msg.obj = username;
 							readHandler.sendMessage(msg);
 							break;
+						case S_CALL_DISCONNECT:
+							username = (String)ois.readObject();
+							Log.i("DC",username + " hung up");
+							msg.what = DirectoryCommand.S_CALL_DISCONNECT.getCode();
+							msg.obj = username;
+							readHandler.sendMessage(msg);
+							break;
 						case S_REDIRECT_INIT:
 							int port = ois.readInt();
 							Log.i("DC","S_REDIRECT_INIT");
@@ -216,11 +223,11 @@ public class DirectoryClient {
 						case S_REDIRECT_READY:
 							Log.i("DC","S_REDIRECT_READY");
 							username = (String)ois.readObject();
-							msg.what = DirectoryCommand.S_CALL_INCOMING.getCode();
+							msg.what = DirectoryCommand.S_REDIRECT_READY.getCode();
 							readHandler.sendMessage(msg);
 							break;
 						default:
-							Log.e("DC","Read error: unrecognized command");
+							Log.e("DC","Read error: unrecognized command " + command.toString());
 					}
 				} catch (Exception e) {
 					Log.e("DC","Read error: ", e);

@@ -85,6 +85,8 @@ public class ActivityDirectory extends ListActivity {
    	       		}
    	       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
    	       			String username2 = (String)msg.obj;
+   	       			Call.setUsername2(username2);
+   	       			Call.setState(Call.State.INCOMING);
    	       			Intent callIncomingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallIncoming.class);
    	       			callIncomingIntent.putExtra("username2",username2);
    	       			startActivity(callIncomingIntent);
@@ -141,8 +143,9 @@ public class ActivityDirectory extends ListActivity {
 		    		   //TODO : implement the connect to the next user
 		    		   //Write to log to check if it is working
 		    		   Log.d("Connect", "to the next user");
+		    		   Call.setUsername2(username2);
+		    		   Call.setState(Call.State.OUTGOING);
 		    		   Intent callOutgoingIntent = new Intent(v.getContext(), ActivityCallOutgoing.class);
-		    		   callOutgoingIntent.putExtra("username2",username2);
 		    		   startActivity(callOutgoingIntent);
 		           }
 		       })
