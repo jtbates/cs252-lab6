@@ -230,7 +230,8 @@ public class DirectoryServer {
 		private void directory_send() throws IOException {
 			synchronized(oos) {
 				oos.writeObject(DirectoryCommand.S_DIRECTORY_SEND);
-				oos.writeObject(userMap);
+				//oos.writeObject(userMap);
+				oos.writeObject(new ArrayList<User>(userMap.values()));
 				oos.flush();
 			}
 		}

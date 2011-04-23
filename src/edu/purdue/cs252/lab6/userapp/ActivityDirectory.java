@@ -2,6 +2,7 @@ package edu.purdue.cs252.lab6.userapp;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -64,8 +65,12 @@ public class ActivityDirectory extends ListActivity {
        			Log.i("AH","adHandler");
    	       		if(msg.what == DirectoryCommand.S_DIRECTORY_SEND.getCode()) {
    	       			userMap.clear();
-					userMap.putAll((Map<String,User>)msg.obj);
-					
+					//userMap.putAll((Map<String,User>)msg.obj);
+   	       			ArrayList<User> users = (ArrayList<User>)msg.obj;
+					for(User u : users) {
+						userMap.put(u.getUserName(),u);
+					}
+   	       			
 					adapter.clear();
 					for(String username2 : userMap.keySet()) {
 						adapter.add(username2);

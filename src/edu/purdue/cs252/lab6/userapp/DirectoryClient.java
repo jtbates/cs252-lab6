@@ -178,9 +178,10 @@ public class DirectoryClient {
 							readHandler.sendMessage(msg);
 							break;
 						case S_DIRECTORY_SEND:
-							ConcurrentHashMap<String,User> userMap = (ConcurrentHashMap<String,User>)ois.readObject();
+							//ConcurrentHashMap<String,User> userMap = (ConcurrentHashMap<String,User>)ois.readObject();
 							msg.what = DirectoryCommand.S_DIRECTORY_SEND.getCode();
-							msg.obj = userMap;
+							//msg.obj = userMap;
+							msg.obj = ois.readObject();
 							readHandler.sendMessage(msg);
 							Log.i("DC","Directory message sent to activity");
 							break;

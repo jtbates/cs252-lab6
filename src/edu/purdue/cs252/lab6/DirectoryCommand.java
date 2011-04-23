@@ -1,6 +1,8 @@
 package edu.purdue.cs252.lab6;
 
-public enum DirectoryCommand {
+import java.io.Serializable;
+
+public enum DirectoryCommand implements Serializable {
 	// commands that the client sends to the server
 	C_LOGIN(0X10), // logs the user in; argument is the client's User class
 	C_LOGOUT(0x11), // no argument
