@@ -14,9 +14,11 @@ import java.io.StreamCorruptedException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -217,7 +219,7 @@ public class DirectoryServer {
 				
 				synchronized(oos) {
 					oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
-					int port = call.getPort(username);
+					int port = call.getRedirectPort(username);
 					oos.writeInt(port);
 					oos.flush();
 					System.out.println("S_REDIRECT_INIT " + port + " to " + username);
@@ -318,7 +320,7 @@ public class DirectoryServer {
 
 				synchronized(oos) {
 					oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
-					int port = call.getPort(username);
+					int port = call.getRedirectPort(username);
 					oos.writeInt(port);
 					oos.flush();
 					System.out.println("S_REDIRECT_INIT " + port + " to " + username);
@@ -383,20 +385,28 @@ public class DirectoryServer {
 	private class Call {
 		HashMap<String,Integer> idMap;
 		ArrayList<String> usernameList;
-		ArrayList<DatagramSocket> socketList;
-		//ArrayList<Thread> threadList;
+		ArrayList<DatagramSocket> rSocketList; // redirect DatagramSocket
+		//ArrayList<InetAddress> nAddressList; // NAT address
+		//ArrayList<Integer> nPortList; // NAT port
+		ArrayList<SocketAddress> nSocketAddressList;
+		ArrayList<Thread> threadList;
+		ArrayList<Boolean> readyList;
 		
 		Call(String username1, String username2) throws IOException {
 			idMap = new HashMap<String,Integer>();
 			usernameList = new ArrayList<String>();
-			socketList = new ArrayList<DatagramSocket>();
-			//threadList = new ArrayList<Thread>();
+			rSocketList = new ArrayList<DatagramSocket>();
+			//nAddressList = new ArrayList<InetAddress>();
+			//nPortList = new ArrayList<Integer>();
+			nSocketAddressList = new ArrayList<SocketAddress>();
+			threadList = new ArrayList<Thread>();
+			readyList = new ArrayList<Boolean>();
 			connect(username1);
 			connect(username2);
 		}
 		
-		int getPort(String username) {
-			DatagramSocket redirect = socketList.get(idMap.get(username));
+		int getRedirectPort(String username) {
+			DatagramSocket redirect = rSocketList.get(idMap.get(username));
 			if(redirect == null) return -1;
 			else return redirect.getLocalPort();
 		}
@@ -405,30 +415,52 @@ public class DirectoryServer {
 			return usernameList;
 		}
 		
-		synchronized void connect(String username) throws IOException {
+		synchronized void connect(final String username) throws IOException {
 			final int id = usernameList.size();
 			idMap.put(username, id);
 			usernameList.add(username);
-			final DatagramSocket redirectFromSocket = new DatagramSocket();
-			socketList.add(redirectFromSocket);
+			readyList.add(false);
+			final DatagramSocket redirectSocket = new DatagramSocket();
+			rSocketList.add(redirectSocket);
 			
+
 			Thread redirectThread = new Thread() {
 				@Override
 				public void run() {
-					int minSize = 17; // need to decide this
+					int minSize = 17; // needs to be specified correctly
 					byte[] buf=new byte[minSize];
+					DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
+					while(!readyList.get(id)) {
+						try {
+							redirectSocket.receive(packet);
+							
+							readyList.set(id,true);
+							//nAddressList.add(packet.getAddress());
+							//nPortList.add(packet.getPort());
+							nSocketAddressList.add(packet.getSocketAddress());
+							
+							System.out.println(username + "'s first UDP packet");
+						} catch (IOException e) {
+							// try again
+						}
+					}
+						
 					while (!isInterrupted()) {
 						try {
-							DatagramPacket packet = new DatagramPacket(buf, buf.length);
-							redirectFromSocket.receive(packet);
-							System.out.println("Received UDP packet " + packet.toString());
-							/*for(int i=0; i<usernameList.size();i++) {
-								if(i != id) {
-									DatagramSocket redirectToSocket = socketList.get(i);
-									redirectToSocket.send(packet);
+							packet = new DatagramPacket(buf, buf.length);
+							redirectSocket.receive(packet);
+							System.out.println("Received UDP packet from " + username + " at (" + packet.getAddress() + "," + packet.getPort() + ")");
+							for(int i=0; i<usernameList.size();i++) {
+								if(i != id && readyList.get(i) == true) {
+									//packet.setSocketAddress(nAddressList.get(i));
+									packet.setSocketAddress(nSocketAddressList.get(i));
+									//packet.setPort(nPortList.get(i));
+									//packet.setPort(nSocketAddressList.get(i).getPort());
+									redirectSocket.send(packet);
+									System.out.println("Sending UDP packet to (" + packet.getAddress() + "," + packet.getPort() + ")");
 								}
-							}*/
+							}
 						}
 						catch (IOException e) {
 							System.out.println("UDP S: Error" + e);
@@ -443,7 +475,7 @@ public class DirectoryServer {
 		
 		synchronized void disconnect(String user_disconnecting) throws IOException {
 			int id = idMap.get(user_disconnecting);
-			DatagramSocket socket = socketList.get(id);
+			DatagramSocket socket = rSocketList.get(id);
 			//Thread thread = threadList.get(id);
 			
 			
@@ -460,9 +492,12 @@ public class DirectoryServer {
 			
 			usernameList.remove(id);
 			socket.close();
-			socketList.remove(id);
-			//thread.interrupt();
-			//threadList.remove(id);
+			rSocketList.remove(id);
+			nSocketAddressList.remove(id);
+			//nPortList.remove(id);
+			readyList.remove(id);
+			threadList.get(id).interrupt();
+			threadList.remove(id);
 			
 			Client client_disconnecting = clientMap.get(user_disconnecting);
 			client_disconnecting.success(DirectoryCommand.C_CALL_HANGUP);			

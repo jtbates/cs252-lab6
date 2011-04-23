@@ -66,11 +66,11 @@ public class RingerServer extends Service {
 		t.start();
 	}
 	
-	@Override
+	/*@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// if killed after returning, restart
-		return START_STICKY;
-	}
+		//return START_STICKY;
+	}*/
 	
 	@Override
 	public IBinder onBind(Intent intent) {

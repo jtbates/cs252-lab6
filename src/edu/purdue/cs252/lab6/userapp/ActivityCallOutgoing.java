@@ -13,14 +13,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class ActivityCallOutgoing extends Activity {
+	private static final String TAG = "ACOutgoing";
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_outgoing);
-
-        
-        
         
         final VoipApp appState = (VoipApp) getApplicationContext();
        	final Activity thisActivity = ActivityCallOutgoing.this;
@@ -31,25 +29,35 @@ public class ActivityCallOutgoing extends Activity {
        	
        	Handler callOutgoingHandler = new Handler() {
        		public void handleMessage(Message msg) {
-       			Log.i("ACO","acoHandler");
+       			Log.i(TAG,"callOutgoingHandler");
    	       		if(msg.what == DirectoryCommand.S_CALL_ACCEPTED.getCode()) {
-   	       			Log.i("ACO","call accepted");
+   	       			Log.i(TAG,"call accepted");
    	       		}
    	       		else if(msg.what == DirectoryCommand.S_REDIRECT_INIT.getCode()) {
-   	       			int port = msg.arg1;
-   	       			Call.setPort(port);
-   	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
-   	       			voicePlayerServer.start();
-   	       			Intent callOngoingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallOngoing.class);
-   	       			startActivityForResult(callOngoingIntent, 0);	
+   	       			try {
+	   	       			int port = msg.arg1;
+	   	       			Call.setPort(port);
+	   	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
+	   	       			voicePlayerServer.start();
+	   	       			Intent callOngoingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallOngoing.class);
+	   	       			startActivityForResult(callOngoingIntent, 0);	
+   	       			}
+   	       			catch(Exception e) {
+   	       				Log.e(TAG,"Call failed " + e.toString());
+   	       				// TODO: handle failed call
+   	       			}
+   	       		} else if(msg.what == DirectoryCommand.S_REDIRECT_READY.getCode()) {
+       				Log.i(TAG,"S_REDIRECT_READY");
+   	       			VoiceCaptureClient voiceCaptureClient = new VoiceCaptureClient(server,Call.getPort());
+   	       			voiceCaptureClient.start();
    	       		}
    	       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
    	       			// ignore
    	       		}
    	       		else {
    	       			// unrecognized message
-   	       			Log.e("ACO","unrecognized message " + msg.what);
-   	       			if(msg.obj != null) Log.e("ACO",msg.obj.toString());
+   	       			Log.e(TAG,"unrecognized message " + msg.what);
+   	       			if(msg.obj != null) Log.e(TAG,msg.obj.toString());
    	       			// TODO: handle error
    	       		}
        		}
@@ -81,5 +89,4 @@ public class ActivityCallOutgoing extends Activity {
         	finish();
         }
     }
-
 }

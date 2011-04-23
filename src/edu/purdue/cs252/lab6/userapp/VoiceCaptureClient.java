@@ -11,67 +11,72 @@ import android.util.Log;
 
 public class VoiceCaptureClient extends Thread {
 	static public String SERVERNAME = "10.0.2.2";
-	static public int SERVERPORT = 25203;
+	static public int SERVERPORT = 25202;
+	static public DatagramSocket socket;
 	private String server;
-	private int port;
+	private int rPort; // redirect port
+	private final int lPort = 25202; // local port
 	
 	VoiceCaptureClient(String server, int port) {
 		super();
 		this.server = server;
-		this.port = port;
+		this.rPort = port;
+		VoiceCaptureClient.socket = VoicePlayerServer.socket;
 	}
 	
 	public void run() {
-		try {
-			Log.i("VCC", "run");
-			/*// Minimum buffer size (can be increased later)
-			int minSize=AudioRecord.getMinBufferSize(4410,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT);
-			// Construct instance of AudioRecord
-			AudioRecord data=new AudioRecord(MediaRecorder.AudioSource.VOICE_CALL,44100,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT,minSize);
-			
-			// Create socket
-			DatagramSocket socket = new DatagramSocket();
-			InetAddress serverAddr = InetAddress.getByName(SERVERNAME);
-			DatagramPacket packet;
-			// 
-			boolean ongoing=true;
-			// Array of bytes length minSize
-			byte[] buf = new byte[minSize];
-			// While call has not ended
-			while (!isInterrupted()) {
+		for(int i = 0; i<10; i++ ) {
+			try {
+				Log.i("VCC", "run");
+				/*// Minimum buffer size (can be increased later)
+				int minSize=AudioRecord.getMinBufferSize(4410,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT);
+				// Construct instance of AudioRecord
+				AudioRecord data=new AudioRecord(MediaRecorder.AudioSource.VOICE_CALL,44100,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT,minSize);
 				
-				//Read data from mic into buf
-				data.read(buf,0,minSize);
-				//Put buffer in a packet
-				packet=new DatagramPacket(buf,buf.length,serverAddr,SERVERPORT);
+				// Create socket
+				DatagramSocket socket = new DatagramSocket();
+				InetAddress serverAddr = InetAddress.getByName(SERVERNAME);
+				DatagramPacket packet;
+				// 
+				boolean ongoing=true;
+				// Array of bytes length minSize
+				byte[] buf = new byte[minSize];
+				// While call has not ended
+				while (!isInterrupted()) {
+					
+					//Read data from mic into buf
+					data.read(buf,0,minSize);
+					//Put buffer in a packet
+					packet=new DatagramPacket(buf,buf.length,serverAddr,SERVERPORT);
+					
+					//Send the packet
+					socket.send(packet);
+				}*/
 				
-				//Send the packet
+				
+				// Retrieve the ServerName
+				InetAddress serverAddr = InetAddress.getByName(server);
+	
+				Log.i("UDP", "VCC: Connecting to " + server + " on " + rPort + "...");
+				// Create new UDP-Socket 
+				//DatagramSocket socket = new DatagramSocket(lPort);
+				
+				// Prepare some data to be sent. 
+				byte[] buf = ("Hello from VoiceCaptureClient").getBytes();
+	
+				// Create UDP-packet with
+				// data & destination(url+port) 
+				DatagramPacket packet = new DatagramPacket(buf, buf.length, serverAddr, rPort);
+				Log.i("UDP", "C: Sending: '" + new String(buf) + "'");
+	
+				// Send out the packet 
 				socket.send(packet);
-			}*/
-			
-			
-			// Retrieve the ServerName
-			InetAddress serverAddr = InetAddress.getByName(server);
-
-			Log.i("UDP", "VCC: Connecting to " + server + " on " + port + "...");
-			// Create new UDP-Socket 
-			DatagramSocket socket = new DatagramSocket();
-			
-			// Prepare some data to be sent. 
-			byte[] buf = ("Hello from VoiceCaptureClient").getBytes();
-
-			// Create UDP-packet with
-			// data & destination(url+port) 
-			DatagramPacket packet = new DatagramPacket(buf, buf.length, serverAddr, port);
-			Log.i("UDP", "C: Sending: '" + new String(buf) + "'");
-
-			// Send out the packet 
-			socket.send(packet);
-			Log.i("UDP", "C: Sent.");
-			Log.i("UDP", "C: Done.");
-			
-		} catch (Exception e) {
-			Log.e("UDP", "C: Error", e);
+				Log.i("UDP", "C: Sent.");
+				Log.i("UDP", "C: Done.");
+				
+			} catch (Exception e) {
+				Log.e("UDP", "C: Error", e);
+			}
 		}
 	}
 }

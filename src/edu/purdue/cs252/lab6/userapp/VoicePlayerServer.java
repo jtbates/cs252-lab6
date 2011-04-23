@@ -3,6 +3,8 @@ package edu.purdue.cs252.lab6.userapp;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -11,14 +13,19 @@ import android.util.Log;
 
 public class VoicePlayerServer extends Thread {
 	static public String SERVERNAME = "10.0.2.2";
-	static public int SERVERPORT = 25203;
+	static public int SERVERPORT = 25202;
+	static public DatagramSocket socket;
+
 	private String server;
 	private int port;
 	
-	VoicePlayerServer(String server, int port) {
+	VoicePlayerServer(String server, int port) throws UnknownHostException, SocketException {
 		super();
 		this.server = server;
 		this.port = port;
+		// Retrieve the ServerName 
+		//InetAddress serverAddr = InetAddress.getByName(server);
+		socket = new DatagramSocket();
 	}
 	
 	public void run() {
@@ -48,13 +55,10 @@ public class VoicePlayerServer extends Thread {
 			}*/
 			
 			
-			// Retrieve the ServerName 
-			InetAddress serverAddr = InetAddress.getByName(server);
 
 			Log.i("UDP", "VPS: Connecting...");
 			// Create new UDP-Socket 
 			//DatagramSocket socket = new DatagramSocket(SERVERPORT, serverAddr);
-			DatagramSocket socket = new DatagramSocket(port, serverAddr);
 			
 			// By magic we know, how much data will be waiting for us 
 			byte[] buf = new byte[17];

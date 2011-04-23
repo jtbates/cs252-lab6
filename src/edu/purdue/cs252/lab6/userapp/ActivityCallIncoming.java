@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class ActivityCallIncoming extends Activity {
+	static final private String TAG = "ACIncoming";
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,20 +35,31 @@ public class ActivityCallIncoming extends Activity {
        	
        	Handler callIncomingHandler = new Handler() {
        		public void handleMessage(Message msg) {
-       			Log.i("ACIncoming","callIncomingHandler");
+       			Log.i(TAG,"callIncomingHandler");
    	       		if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
    	       			// ignore
    	       		}
    	       		else if(msg.what == DirectoryCommand.S_REDIRECT_INIT.getCode()) {
-   	       			int port = msg.arg1;
-   	       			Call.setPort(port);
-   	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
-   	       			voicePlayerServer.start();
-   	       			Intent callOngoingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallOngoing.class);
-   	       			startActivityForResult(callOngoingIntent, 0);
+   	       			try {
+	   	       			int port = msg.arg1;
+	   	       			Call.setPort(port);
+	   	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
+	   	       			voicePlayerServer.start();
+	   	       			Intent callOngoingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallOngoing.class);
+	   	       			startActivityForResult(callOngoingIntent, 0);
+   	       			}
+   	       			catch(Exception e) {
+   	       				// TODO: handle failed call
+   	       				Log.e(TAG,"Call failed " + e.toString());
+   	       			}
+   	       		}
+   	       		else if(msg.what == DirectoryCommand.S_REDIRECT_READY.getCode()) {
+       				Log.i(TAG,"S_REDIRECT_READY");
+   	       			VoiceCaptureClient voiceCaptureClient = new VoiceCaptureClient(server,Call.getPort());
+   	       			voiceCaptureClient.start();
    	       		}
    	       		else {
-   	       			Log.e("ACIncoming","unrecognized message " + msg.what + " " + msg.obj.toString());
+   	       			Log.e(TAG,"unrecognized message " + msg.what + " " + msg.obj.toString());
    	       			// unrecognized message
    	       			// TODO: handle error
    	       		}
