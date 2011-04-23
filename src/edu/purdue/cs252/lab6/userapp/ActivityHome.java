@@ -29,13 +29,13 @@ public class ActivityHome extends Activity {
             
              //Switch Statement added in case multiple buttons are added to the original screen
              switch (v.getId()) {
-             case R.id.ButtonSignIn:
-             String username;
-             username = editTextUser.getText().toString();
-             Intent directoryIntent = new Intent(v.getContext(), ActivityDirectory.class);
-             directoryIntent.putExtra("USER", username);
-             startActivity(directoryIntent);
-             break;
+             	case R.id.ButtonSignIn:
+             		String username;
+             		username = editTextUser.getText().toString();
+             		Intent directoryIntent = new Intent(v.getContext(), ActivityDirectory.class);
+             		directoryIntent.putExtra("USER", username);
+             		startActivity(directoryIntent);
+             		break;
              }
             
                

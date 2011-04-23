@@ -133,13 +133,14 @@ public class DirectoryServer {
 		}
 		
 		private void logout() throws IOException {
-			thread.stop();
+			thread.interrupt();
 
-			synchronized(client) {
-				ois.close();
-				oos.close();
-				client.close();
-			}
+			try {
+				synchronized(oos) {
+					ois.close();
+					oos.close();
+				}
+			} catch(IOException e) {}
 		}
 	}
 	

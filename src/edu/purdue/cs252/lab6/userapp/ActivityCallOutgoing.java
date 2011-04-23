@@ -9,10 +9,16 @@ public class ActivityCallOutgoing extends Activity {
     /** Called when the activity is first created. */
 	
 	User usr;
+	static boolean running = true;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(!running) {
+        	Intent intent = new Intent();
+            setResult(RESULT_OK, intent);
+            finish();
+        }
         setContentView(R.layout.call_outgoing);
         Bundle extras = getIntent().getExtras();
         

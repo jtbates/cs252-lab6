@@ -61,7 +61,7 @@ public class DirectoryClient extends Thread {
 	 * Parameters: Socket clientSocket
 	 * Return: void
 	 */
-	public void login(Socket clientSocket) throws IOException {
+	public void login() throws IOException {
 		ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
 		Log.d("Login:", usr.getUserName());
 
@@ -75,7 +75,7 @@ public class DirectoryClient extends Thread {
 		state = DirectoryCommand.C_DIRECTORY_GET;
 	}	
 	
-	public void logout(Socket clientSocket) throws IOException {
+	public void logout() throws IOException {
 		ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
 		
 		oos.writeObject((DirectoryCommand)DirectoryCommand.C_LOGOUT);
@@ -118,7 +118,7 @@ public class DirectoryClient extends Thread {
 				switch(state) {
 					case C_LOGIN:
 						Log.d("Client Command", "C_LOGIN");
-						login(clientSocket);
+						login();
 						break;
 					case C_DIRECTORY_GET:
 						getDirectories(clientSocket);

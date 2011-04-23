@@ -14,16 +14,13 @@ import edu.purdue.cs252.lab6.User;
 public class ActivityCallOngoing extends Activity {
     /** Called when the activity is first created. */
 	
-	User usr;
+	static User usr;
+	static int inOrOut = 0;
 	static public int SERVERPORT = 25202;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle extras = getIntent().getExtras();
-        if (this.getIntent().getExtras() != null) {
-        	usr = (User)extras.get("USER");
-        }
         setContentView(R.layout.call_ongoing);
         
         
@@ -32,9 +29,16 @@ public class ActivityCallOngoing extends Activity {
         		public void onClick(View v) {
             	// TODO: Code to end call (notify other caller, stop voice capture & voice player)
           
-				Intent directoryIntent = new Intent(v.getContext(), ActivityDirectory.class);
-    			startActivity(directoryIntent);
-            	
+        			Intent intent = new Intent();
+                    setResult(RESULT_OK, intent);
+                    if(inOrOut == 0) {
+                    	ActivityCallIncoming.running = false;
+                    }else {
+                    	ActivityCallOutgoing.running = false;
+                    }
+                    finish();
+
+           	
             }
         });
     }

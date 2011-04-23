@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, Home!</string>
-    <string name="app_name">lab6</string>
+    <string name="app_name">CS252 Voip</string>
+    <string name="main_empty_list">No Users Online</string>
 </resources>

@@ -1,5 +1,7 @@
 package edu.purdue.cs252.lab6.userapp;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -11,9 +13,11 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.Spinner;
 import edu.purdue.cs252.lab6.User;
 
 
@@ -27,6 +31,7 @@ public class ActivityDirectory extends ListActivity {
 	
 	DirectoryClient dc = null;
 	static User selected = null;
+	private String array_spinner[];
 	
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -66,25 +71,27 @@ public class ActivityDirectory extends ListActivity {
 		AlertDialog alert = builder.create();
 		alert.show();
 	}
-
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.directory);
         Bundle extras = getIntent().getExtras();
         
         String userName = "";
+       
         if (this.getIntent().getExtras() != null) {
-        	userName = extras.getString("USER");
+        	
+        		userName = extras.getString("USER");
+        		try {
+            		dc = new DirectoryClient(userName);
+            	} catch(Exception e) {}
+                
+                Log.d("Login", userName);
+        	
         
         	
-        }
-        
-        try {
-    		dc = new DirectoryClient(userName);
-    	} catch(Exception e) {}
-        
-        Log.d("Login", userName);
-   
+        }   
    		
    		try {
    			// wait until directory is loaded
@@ -96,9 +103,34 @@ public class ActivityDirectory extends ListActivity {
 			e.printStackTrace();
 		}
 		
-		// Create an ArrayAdapter, that will actually make the Strings above
+		// Create an ArrayAdapter, that will actually ma			userMap.remove(username);ke the Strings above
 		// appear in the ListView
-		this.setListAdapter(new ArrayAdapter<User>(this, R.layout.directory, R.id.user, dc.userList));
+		
+		array_spinner = new String[2];
+		array_spinner[0] = "Alphabetical";
+		array_spinner[1] = "Elegant";
+		
+		final Spinner s = (Spinner)findViewById(R.id.sort_by);
+		ArrayAdapter a = new ArrayAdapter(this, android.R.layout.simple_spinner_item, array_spinner);
+		s.setAdapter(a);
+		
+		this.setListAdapter(new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, dc.userList));
+		
+		final Button buttonCall = (Button) findViewById(R.id.ButtonLogout);
+        buttonCall.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            	// TODO: Logout	
+            	try {
+					dc.logout();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	Intent intent = new Intent();
+            	setResult(RESULT_OK, intent);
+            	finish();
+            }
+        });
     
 		
    		
@@ -106,15 +138,8 @@ public class ActivityDirectory extends ListActivity {
 		
 		Intent rsIntent = new Intent(this, RingerServer.class);
 		startService(rsIntent);
-		/*
-        final Button buttonCall = (Button) findViewById(R.id.ButtonCall);
-        buttonCall.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-            	// Switch to outgoing call activity
-                Intent callOutgoingIntent = new Intent(v.getContext(), ActivityCallOutgoing.class);
-                startActivityForResult(callOutgoingIntent, 0);
-            }
-        });   */     
+		
+             
     }
 
 	@Override
@@ -142,7 +167,7 @@ public class ActivityDirectory extends ListActivity {
     		
         	// Switch to incoming call activity
         	Intent callIncomingIntent = new Intent(context,ActivityCallIncoming.class);
-        	callIncomingIntent.putExtra("USER", usr);
+        	ActivityCallIncoming.usr = usr;
         	((Activity) context).startActivityForResult(callIncomingIntent,0);
     	}
 

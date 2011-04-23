@@ -42,7 +42,7 @@ public class RingerClient implements Runnable {
 			
 	        new Thread(new VoicePlayerServer()).start();
 	        // Start voice capture client
-	        new Thread(new VoiceCaptureClient()).start();
+	        new Thread(new VoiceCaptureClient(usr)).start();
 	        
         	// Close the connection
 			//clientSocket.close();
