@@ -6,8 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import edu.purdue.cs252.lab6.DirectoryCommand;
-import edu.purdue.cs252.lab6.User;
+import edu.purdue.cs252.lab6.*;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -66,8 +65,10 @@ public class ActivityDirectory extends ListActivity {
    	       		if(msg.what == DirectoryCommand.S_DIRECTORY_SEND.getCode()) {
    	       			userMap.clear();
 					//userMap.putAll((Map<String,User>)msg.obj);
-   	       			ArrayList<User> users = (ArrayList<User>)msg.obj;
-					for(User u : users) {
+   	       			//ArrayList<User> users = (ArrayList<User>)msg.obj;
+   	       			UserList uList = (UserList)msg.obj;
+					for(int i=0; i<uList.size(); i++) {
+						User u = uList.get(i);
 						userMap.put(u.getUserName(),u);
 					}
    	       			

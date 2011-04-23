@@ -28,9 +28,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
-import edu.purdue.cs252.lab6.DirectoryCommand;
-import edu.purdue.cs252.lab6.User;
-import edu.purdue.cs252.lab6.userapp.Call;
+import edu.purdue.cs252.lab6.*;
 
 public class DirectoryServer {
 	static final String SERVERIP = "127.0.0.1";
@@ -231,7 +229,7 @@ public class DirectoryServer {
 			synchronized(oos) {
 				oos.writeObject(DirectoryCommand.S_DIRECTORY_SEND);
 				//oos.writeObject(userMap);
-				oos.writeObject(new ArrayList<User>(userMap.values()));
+				oos.writeObject(new UserList(userMap.values()));
 				oos.flush();
 			}
 		}
