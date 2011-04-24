@@ -71,16 +71,11 @@ public class ActivityCallIncoming extends Activity {
             	// Stop ringtone
             	mMediaPlayer.stop();
             	// Start the voice player server
-            	server = new Thread(new VoicePlayerServer());
-            	server.start();
+            	new VoicePlayerServer();
             	// TODO: Start voice capture client after confirming caller's voice player server has started
-            	try {
-            		Thread.sleep(500);
-            	} catch (InterruptedException e) {}
             	
             	// Start the voice capture client
-        		client = new Thread(new VoiceCaptureClient(usr));
-        		client.start();
+        		new VoiceCaptureClient(usr);
         		
             	// Switch to ongoing call activity
         		Call.setState(Call.State.ONGOING);

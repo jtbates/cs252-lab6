@@ -13,10 +13,11 @@ import edu.purdue.cs252.lab6.User;
 public class RingerClient implements Runnable {
 	static public String SERVERNAME = "10.0.2.2";
 	static public int SERVERPORT = 25202;
-	User usr;
+	User usr,you;
 	
-	public RingerClient(User usr) {
+	public RingerClient(User usr, User you) {
 		this.usr = usr;
+		this.you = you;
 	}
 	
 
@@ -33,16 +34,16 @@ public class RingerClient implements Runnable {
 			ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
 			
 			oos.writeObject(Call.getState());
-			oos.writeObject(usr);
+			oos.writeObject(you);
 			oos.flush();
 			
 			
 			Call.setState(Call.State.ONGOING);
 			// Start the voice player server
 			
-	        new Thread(new VoicePlayerServer()).start();
+	        new VoicePlayerServer();
 	        // Start voice capture client
-	        new Thread(new VoiceCaptureClient(usr)).start();
+	        new VoiceCaptureClient(usr);
 	        
         	// Close the connection
 			//clientSocket.close();

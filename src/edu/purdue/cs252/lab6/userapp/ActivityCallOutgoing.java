@@ -23,13 +23,13 @@ public class ActivityCallOutgoing extends Activity {
         Bundle extras = getIntent().getExtras();
         
         final User usr = (User)extras.get("USER");
-        
+        final User you = (User)extras.get("YOU");
         
         // TODO: cancel button
         
         try {
         	// Attempt connection to ringer server 
-        	Thread ringing = new Thread(new RingerClient(usr));
+        	Thread ringing = new Thread(new RingerClient(usr,you));
         	ringing.start();
         	
         	ringing.join();        	

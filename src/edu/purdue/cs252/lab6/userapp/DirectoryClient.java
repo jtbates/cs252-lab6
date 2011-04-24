@@ -20,7 +20,7 @@ public class DirectoryClient extends Thread {
 	static public Object initMonitor = new Object();
 
 	//Current user login information
-	public User usr;
+	static public User usr;
 
 	//Stores the userList
 	public ArrayList<User> userList = new ArrayList<User>();
@@ -37,12 +37,13 @@ public class DirectoryClient extends Thread {
 	 * Parameters: String usrName
 	 * Return: none
 	 */
-	public DirectoryClient(String usrName) throws Exception {
+	public DirectoryClient(User usr) throws Exception {
 		serverAddr = InetAddress.getByName(SERVERNAME);
 		clientSocket = new Socket(serverAddr, SERVERPORT);
 		String str = clientSocket.getLocalAddress().toString();
 		ipAddr = str.substring(1,str.length());
-		this.usr = new User(ipAddr,usrName);
+		this.usr = usr;
+		this.usr.setUserIp(ipAddr);
 		this.usr.changeConnection();
 		this.start();
 	}

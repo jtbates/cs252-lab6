@@ -23,6 +23,7 @@ public class DirectoryServer {
 	static Socket clientSocket = null;
 
 	static ArrayList<User> userList = new ArrayList<User>();
+	static ArrayList<Client> clientList = new ArrayList<Client>();
 	
 	public static void main(String[] args) {
 		DirectoryServer dserver = new DirectoryServer();
@@ -163,6 +164,7 @@ public class DirectoryServer {
 			});
 		
 			Client client = new Client(user,clientSocket);
+			clientList.add(client);
 			ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
 			oos.writeObject(DirectoryCommand.S_STATUS_OK);
 		}

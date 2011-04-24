@@ -1,8 +1,5 @@
 package edu.purdue.cs252.lab6.userapp;
 
-import java.io.IOException;
-import java.net.Socket;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,7 +25,7 @@ public class ActivityCallOngoing extends Activity {
         	buttonCallEnd.setOnClickListener(new OnClickListener() {
         		public void onClick(View v) {
             	// TODO: Code to end call (notify other caller, stop voice capture & voice player)
-          
+        		
         			Intent intent = new Intent();
                     setResult(RESULT_OK, intent);
                     if(inOrOut == 0) {

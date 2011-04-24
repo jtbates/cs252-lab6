@@ -48,6 +48,10 @@ public class User implements Serializable {
 	public String getUserIp() {
 		return userIP;
 	}
+	
+	public void setUserIp(String ip) {
+		this.userIP = ip;
+	}
 
 	public String connectionStatus() {
 		return isConnected?"Online":"Offline";

@@ -31,6 +31,7 @@ public class ActivityDirectory extends ListActivity {
 	
 	DirectoryClient dc = null;
 	static User selected = null;
+	static User active = null;
 	private String array_spinner[];
 	
 	@Override
@@ -53,9 +54,10 @@ public class ActivityDirectory extends ListActivity {
 		    	   public void onClick(DialogInterface dialog, int id) {
 		    		   //TODO : implement the connect to the next user
 		    		   //Write to log to check if it is working
-		    		   Log.d("Connect", "to the next user");
+		    		   Log.d("Connect", active.getUserName() + "to the next user");
 		    		   Intent callOutgoingIntent = new Intent(view.getContext(), ActivityCallOutgoing.class);
 		    		   callOutgoingIntent.putExtra("USER", selected);
+		    		   callOutgoingIntent.putExtra("YOU", active);
 		    	       startActivity(callOutgoingIntent);
 		           }
 		       })
@@ -84,13 +86,9 @@ public class ActivityDirectory extends ListActivity {
         	
         		userName = extras.getString("USER");
         		try {
-            		dc = new DirectoryClient(userName);
-            	} catch(Exception e) {}
-                
-                Log.d("Login", userName);
-        	
-        
-        	
+        			active = new User(userName);
+            		dc = new DirectoryClient(active);
+            	} catch(Exception e) {}        	
         }   
    		
    		try {

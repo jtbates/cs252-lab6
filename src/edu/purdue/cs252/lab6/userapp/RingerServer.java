@@ -40,8 +40,8 @@ public class RingerServer extends Service {
 						
 						Call.State cs = (Call.State) ois.readObject();
 						
-						//if(cs == Call.State.OUTGOING)
-						//{
+						if(cs == Call.State.OUTGOING)
+						{
 							//if(Call.getState() == Call.State.IDLE)
 							//{
 								//Get user information of caller
@@ -54,7 +54,7 @@ public class RingerServer extends Service {
 								intentIncomingCall.putExtra("USER", caller);
 								sendBroadcast(intentIncomingCall);
 							//}
-						//}
+						}
 							
 						
 						Log.d("TCP", "RS: Done.");
