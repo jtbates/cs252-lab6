@@ -465,6 +465,7 @@ public class DirectoryServer {
 		
 		synchronized void disconnect(String user_disconnecting) {
 			int id = idMap.get(user_disconnecting);
+			readyList.set(id,false);
 			DatagramSocket socket = rSocketList.get(id);
 			
 			for(int i=0;i<usernameList.size();i++) {
@@ -502,7 +503,8 @@ public class DirectoryServer {
 			}
 			
 			if(usernameList.size() == 1) {
-				rSocketList.get(0).close();
+				DatagramSocket lSocket = rSocketList.get(0);
+				if(!lSocket.isClosed()) lSocket.close();
 				threadList.get(0).interrupt();
 				callMap.remove(usernameList.get(0));
 			}
