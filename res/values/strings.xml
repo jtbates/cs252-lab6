@@ -2,5 +2,10 @@
 <resources>
     <string name="hello">Hello World, Home!</string>
     <string name="app_name">lab6</string>
-<string name="buttonHandler">myClickHandler</string>
+	<string name="buttonHandler">myClickHandler</string>
+	<string name="main_empty_list">No Users Online</string>
+	<string-array name="sort_by">
+        <item>A-Z</item>
+        <item>Z-A</item>
+    </string-array>
 </resources>

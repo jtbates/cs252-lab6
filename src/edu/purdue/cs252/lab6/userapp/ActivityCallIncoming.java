@@ -44,15 +44,17 @@ public class ActivityCallIncoming extends Activity {
        	Uri alert = RingtoneManager.getActualDefaultRingtoneUri(getBaseContext(),RingtoneManager.TYPE_RINGTONE);
         mMediaPlayer = new MediaPlayer();
         try {
-        	mMediaPlayer.setDataSource(this, alert);
+        	if(alert != null) {
+        		mMediaPlayer.setDataSource(this, alert);
 
-        	final AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        		final AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
         		if (audioManager.getStreamVolume(AudioManager.STREAM_RING) != 0) {
         			mMediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
         			mMediaPlayer.setLooping(true);
         			mMediaPlayer.prepare();
         			mMediaPlayer.start();
         		}
+        	}
         } catch (IllegalArgumentException e1) {
         	// TODO Auto-generated catch block
         	e1.printStackTrace();
