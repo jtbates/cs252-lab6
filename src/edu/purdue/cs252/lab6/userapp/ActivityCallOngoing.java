@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 public class ActivityCallOngoing extends Activity {
 	private static final String TAG = "ACOngoing";
+	private Activity thisActivity;
+	private VoipApp appState;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -21,11 +23,12 @@ public class ActivityCallOngoing extends Activity {
         setContentView(R.layout.call_ongoing);
         Call.setState(Call.State.ONGOING);
         
-        final VoipApp appState = (VoipApp) getApplicationContext(); 
+        appState = (VoipApp) getApplicationContext(); 
+        thisActivity = ActivityCallOngoing.this;
+
         // get the directory client 
        	final DirectoryClient dc = appState.getDirectoryClient();
-       	final Activity thisActivity = ActivityCallOngoing.this;
-
+       	
        	final String server = dc.getServer();
        	dc.call_ready();
       	
@@ -35,6 +38,7 @@ public class ActivityCallOngoing extends Activity {
        			if(msg.what == DirectoryCommand.S_REDIRECT_READY.getCode()) {
        				Log.i(TAG,"S_REDIRECT_READY");
    	       			VoiceCaptureClient voiceCaptureClient = new VoiceCaptureClient(server,Call.getPort());
+   	       			appState.setVoiceCaptureClient(voiceCaptureClient);
    	       			voiceCaptureClient.start();
    	       		} 
        			else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
@@ -73,7 +77,8 @@ public class ActivityCallOngoing extends Activity {
     }
     
     void returnToDirectory() {
-       	final Activity thisActivity = ActivityCallOngoing.this;
+    	appState.getVoiceCaptureClient().interrupt();
+    	appState.getVoicePlayerServer().interrupt();
 		Intent directoryIntent = new Intent(thisActivity.getBaseContext(), ActivityDirectory.class);
 		directoryIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(directoryIntent);

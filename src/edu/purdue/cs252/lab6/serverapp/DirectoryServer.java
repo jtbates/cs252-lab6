@@ -491,6 +491,7 @@ public class DirectoryServer {
 			readyList.remove(id);
 			threadList.get(id).interrupt();
 			threadList.remove(id);
+			callMap.remove(user_disconnecting);
 			
 			Client client_disconnecting = clientMap.get(user_disconnecting);
 			try {
@@ -498,6 +499,12 @@ public class DirectoryServer {
 			}
 			catch(IOException e) {
 				System.out.println("Error informing " + user_disconnecting + " of successful call disconnect: " + e);
+			}
+			
+			if(usernameList.size() == 1) {
+				rSocketList.get(0).close();
+				threadList.get(0).interrupt();
+				callMap.remove(usernameList.get(0));
 			}
 		}
 		
