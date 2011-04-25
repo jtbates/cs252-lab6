@@ -19,6 +19,7 @@ public class VoicePlayerServer extends Thread {
 	private int sampleRate = 8000;
 	private int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+	private byte[] buffer;
 	
 	VoicePlayerServer(String server, int port) throws UnknownHostException, SocketException {
 		super();
@@ -28,12 +29,12 @@ public class VoicePlayerServer extends Thread {
 	public void run() {
 		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
 		AudioTrack speaker = null;
-		byte[][] buffers = new byte[256][160];
 		int ix = 0;
 		
 		// Minimum buffer size (can be increased later)
 		int N =AudioTrack.getMinBufferSize(sampleRate,channelConfig,audioFormat);
-
+		buffer = new byte[N];
+		
 		// Create instance of AudioTrack
 		speaker = new AudioTrack(AudioManager.STREAM_VOICE_CALL,sampleRate,channelConfig,audioFormat,N,AudioTrack.MODE_STREAM);
 
@@ -41,8 +42,6 @@ public class VoicePlayerServer extends Thread {
 		
 		while(!isInterrupted()) {
 			try {
-				byte[] buffer = buffers[ix++ % buffers.length];
-
 				//Define the packet
 				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 

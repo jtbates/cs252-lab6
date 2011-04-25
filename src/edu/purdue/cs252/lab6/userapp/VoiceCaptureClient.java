@@ -15,7 +15,7 @@ public class VoiceCaptureClient extends Thread {
 	static public DatagramSocket socket;
 	private String server;
 	private int rPort; // redirect port
-	//private final int lPort = 25202; // local port
+	private byte buffer[];
 	
 	private int sampleRate = 8000;
 	private int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
@@ -34,8 +34,6 @@ public class VoiceCaptureClient extends Thread {
 			
 			// Initialize
 			AudioRecord recorder = null;
-			byte[][] buffers = new byte[256][160];
-			int ix = 0;
 			DatagramPacket packet;
 	
 			// Retrieve the ServerName
@@ -44,6 +42,8 @@ public class VoiceCaptureClient extends Thread {
 			// Minimum buffer size (can be increased later)
 			int N = AudioRecord.getMinBufferSize(sampleRate,channelConfig,audioFormat);
 	
+			buffer = new byte[N];
+			
 			// Construct instance of AudioRecord
 			recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,sampleRate,channelConfig,audioFormat,N*10);
 	
@@ -53,11 +53,9 @@ public class VoiceCaptureClient extends Thread {
 			
 			while(!isInterrupted()) {
 				try {
-					
-					byte[] buffer = buffers[ix++ % buffers.length];
 	
 					//Read data from mic into buf
-					N = recorder.read(buffer,0,buffer.length);
+					recorder.read(buffer,0,buffer.length);
 					//Put buffer in a packet
 					packet=new DatagramPacket(buffer,buffer.length,serverAddr,rPort);
 	
