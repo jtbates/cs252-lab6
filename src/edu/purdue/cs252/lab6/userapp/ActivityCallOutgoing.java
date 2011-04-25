@@ -38,6 +38,7 @@ public class ActivityCallOutgoing extends Activity {
 	   	       			int port = msg.arg1;
 	   	       			Call.setPort(port);
 	   	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
+	   	       			appState.setVoicePlayerServer(voicePlayerServer);
 	   	       			voicePlayerServer.start();
 	   	       			Intent callOngoingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallOngoing.class);
 	   	       			startActivityForResult(callOngoingIntent, 0);	
