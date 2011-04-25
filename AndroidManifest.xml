@@ -16,7 +16,8 @@
         <activity android:name="ActivityCallOutgoing"></activity>
         <activity android:name="ActivityCallOngoing"></activity>
         <service android:name="RingerServer"></service>
-    </application>
+    <activity android:name="ActivitySettings"></activity>
+</application>
 
 <uses-permission android:name="android.permission.INTERNET" /> 
 
