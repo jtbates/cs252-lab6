@@ -447,9 +447,10 @@ public class DirectoryServer {
 							redirectSocket.receive(packet);
 							System.out.println("Received UDP packet from " + username + " at (" + packet.getAddress() + "," + packet.getPort() + ")");
 							for(int i=0; i<usernameList.size();i++) {
-								if(i == id && readyList.get(i) == true) {
+								if(i != id && readyList.get(i) == true) {
 									packet.setSocketAddress(nSocketAddressList.get(i));
-									redirectSocket.send(packet);
+									DatagramSocket rSocket = rSocketList.get(i);
+									rSocket.send(packet);
 									System.out.println("Sending UDP packet to (" + packet.getAddress() + "," + packet.getPort() + ")");
 								}
 							}
