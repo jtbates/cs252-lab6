@@ -441,13 +441,13 @@ public class DirectoryServer {
 						
 						while (!isInterrupted()) {
 							redirectSocket.receive(packet);
-							System.out.println("Received UDP packet from " + username + " at (" + packet.getAddress() + "," + packet.getPort() + ")");
+							//System.out.println("Received UDP packet from " + username + " at (" + packet.getAddress() + "," + packet.getPort() + ")");
 							for(int i=0; i<usernameList.size();i++) {
 								if(i != id && readyList.get(i) == true) {
 									packet.setSocketAddress(nSocketAddressList.get(i));
 									DatagramSocket rSocket = rSocketList.get(i);
 									rSocket.send(packet);
-									System.out.println("Sending UDP packet to (" + packet.getAddress() + "," + packet.getPort() + ")");
+									//System.out.println("Sending UDP packet to (" + packet.getAddress() + "," + packet.getPort() + ")");
 								}
 							}
 						}
