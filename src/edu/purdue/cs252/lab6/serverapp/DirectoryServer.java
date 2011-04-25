@@ -426,7 +426,7 @@ public class DirectoryServer {
 			Thread redirectThread = new Thread() {
 				@Override
 				public void run() {
-					int minSize = 17; // needs to be specified correctly
+					int minSize = 160; // needs to be specified correctly
 					byte[] buf=new byte[minSize];
 					DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
