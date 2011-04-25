@@ -503,9 +503,9 @@ public class DirectoryServer {
 			}
 			
 			if(usernameList.size() == 1) {
+				threadList.get(0).interrupt();
 				DatagramSocket lSocket = rSocketList.get(0);
 				if(!lSocket.isClosed()) lSocket.close();
-				threadList.get(0).interrupt();
 				callMap.remove(usernameList.get(0));
 			}
 		}
