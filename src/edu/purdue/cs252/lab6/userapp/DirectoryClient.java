@@ -98,70 +98,6 @@ public class DirectoryClient {
 	public synchronized void setReadHandler(Handler handler) {
 		this.readHandler = handler;
 	}
-	
-	/*
-	* Summary:      Sets the current state of the directory client
-	* Parameters:   DirectoryCommand state
-	* Return: 		void
-	*/   
-	/*public void setState(DirectoryCommand state) {
-		this.state = state;
-	}*/
-	
-	/*
-	* Summary:      Logs the server user into the server
-	* Parameters:   Socket clientSocket
-	* Return: 		void
-	*/  
-	/*public void login(Socket clientSocket) throws IOException {
-		ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-		Log.d("Login:", user.getUserName());
-		
-		//Write the DirectoryCommand then the user
-		oos.writeObject((DirectoryCommand)DirectoryCommand.C_LOGIN);
-		oos.writeObject(user);
-    	oos.flush();
-    	
-    	//Set the state to get the DirectoryCommand.C_Directory_Get
-    	state = DirectoryCommand.C_DIRECTORY_GET;
-	}*/
-	
-	/*
-	* Summary:      Get the current users logged into the system
-	* Parameters:   Socket clientSocket
-	* Return: 		void
-	*/  
-	/*public void getDirectories(Socket clientSocket) throws IOException, ClassNotFoundException {
-		//Create the Object output stream and sent the C_DIRECTORY_GET command
-		ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-		oos.writeObject((DirectoryCommand)DirectoryCommand.C_DIRECTORY_GET);
-		oos.flush();
-
-		//Creat the ObjectInputstream and get the incoming directory command and hashmap
-		ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-		DirectoryCommand dc = (DirectoryCommand)ois.readObject();
-		ConcurrentHashMap<String,User> temp = (ConcurrentHashMap<String,User>)ois.readObject();
-
-		Iterator i = temp.entrySet().iterator();
-		userList = new String[temp.size()];
-		
-		int c = 0;
-		//Traverse the Hashmap
-		while(i.hasNext()) {
-			Map.Entry<String,User>  me = (Map.Entry<String,User> )i.next();
-			String user = me.getKey();
-			Log.d("User", user);
-			
-			//Something to represent yourself on the user list
-			if (user.equals(user.getUserName())) {
-				userList[c] = me.getKey() + "(You)";
-			} else {
-				userList[c] = me.getKey();
-			}
-			c = c + 1;
-		}
-		state = null;
-	}*/
 		
 	private class ReadThread extends Thread {
 		public void run() {
@@ -331,6 +267,24 @@ public class DirectoryClient {
 				}
 				catch(IOException e) {
 					Log.e(TAG, "Write error, call_ready write failed");
+				}
+			}
+		});		
+	}
+
+	public void call_hangup() {
+		Log.i(TAG,"hanging up from call");
+		writeHandler.post(new Runnable() {
+			public void run() {
+				try {
+					synchronized(socket) {
+						oos.writeObject(DirectoryCommand.C_CALL_HANGUP);
+						oos.flush();
+						Log.i(TAG,"call hangup write finish");
+					}
+				}
+				catch(IOException e) {
+					Log.e(TAG, "Write error, call hangup failed");
 				}
 			}
 		});		

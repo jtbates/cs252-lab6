@@ -166,14 +166,16 @@ public class DirectoryServer {
 							}
 						}
 						catch(EOFException e) {
-							System.out.println("DS: Client disconnected");
+							System.out.println("DS: " + username + " disconnected unexpectedly");
 							logout();
 							break;
 							//TODO: need code to handle unexpected disconnect
 						}
 						catch(IOException e) {
-							System.out.println("DS: Error " + e);
+							System.out.println("DS: " + username + " IOException: " + e);
 							e.printStackTrace();
+							logout();
+							break;
 						}
 						catch(ClassNotFoundException e) {
 							System.out.println("DS: Error " + e);
@@ -430,20 +432,14 @@ public class DirectoryServer {
 					byte[] buf=new byte[minSize];
 					DatagramPacket packet = new DatagramPacket(buf, buf.length);
 					
-					while(!readyList.get(id)) {
-						try {
-							redirectSocket.receive(packet);
-							nSocketAddressList.set(id,packet.getSocketAddress());
-							readyList.set(id,true);
-							
-							System.out.println(username + "'s first UDP packet");
-						} catch (IOException e) {
-							// try again
-						}
-					}
-					while (!isInterrupted()) {
-						try {
-							//packet = new DatagramPacket(buf, buf.length);
+					try {
+						redirectSocket.receive(packet);
+						nSocketAddressList.set(id,packet.getSocketAddress());
+						readyList.set(id,true);
+						
+						System.out.println(username + "'s first UDP packet");
+						
+						while (!isInterrupted()) {
 							redirectSocket.receive(packet);
 							System.out.println("Received UDP packet from " + username + " at (" + packet.getAddress() + "," + packet.getPort() + ")");
 							for(int i=0; i<usernameList.size();i++) {
@@ -455,10 +451,11 @@ public class DirectoryServer {
 								}
 							}
 						}
-						catch (IOException e) {
-							System.out.println("UDP S: Error" + e);
-							e.printStackTrace();
-						}
+					}
+					catch (IOException e) {
+						System.out.println("UDP Redirect Error for " + username + ": " + e);
+						e.printStackTrace();
+						disconnect(username);
 					}
 				}
 			};
@@ -466,17 +463,21 @@ public class DirectoryServer {
 			redirectThread.start();
 		}
 		
-		synchronized void disconnect(String user_disconnecting) throws IOException {
+		synchronized void disconnect(String user_disconnecting) {
 			int id = idMap.get(user_disconnecting);
 			DatagramSocket socket = rSocketList.get(id);
-			//Thread thread = threadList.get(id);
-			
 			
 			for(int i=0;i<usernameList.size();i++) {
 				if(i!=id) {
 					String username = usernameList.get(i);
 					Client client = clientMap.get(username);
-					client.call_disconnect(user_disconnecting);
+					try {
+						client.call_disconnect(user_disconnecting);
+					}
+					catch(IOException e) {
+						System.out.println("Error informing " + username + " of " + user_disconnecting + "'s call disconnect: " + e);
+						disconnect(username);
+					}
 					if(i>id) {
 						idMap.put(username, i-1);
 					}
@@ -487,17 +488,17 @@ public class DirectoryServer {
 			socket.close();
 			rSocketList.remove(id);
 			nSocketAddressList.remove(id);
-			//nPortList.remove(id);
 			readyList.remove(id);
 			threadList.get(id).interrupt();
 			threadList.remove(id);
 			
 			Client client_disconnecting = clientMap.get(user_disconnecting);
-			client_disconnecting.success(DirectoryCommand.C_CALL_HANGUP);			
-		}
-		
-		private class Caller {
-			
+			try {
+				client_disconnecting.success(DirectoryCommand.C_CALL_HANGUP);
+			}
+			catch(IOException e) {
+				System.out.println("Error informing " + user_disconnecting + " of successful call disconnect: " + e);
+			}
 		}
 		
 	}

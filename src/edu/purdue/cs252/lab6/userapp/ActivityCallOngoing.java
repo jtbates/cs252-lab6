@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class ActivityCallOngoing extends Activity {
 	private static final String TAG = "ACOngoing";
@@ -35,10 +36,22 @@ public class ActivityCallOngoing extends Activity {
        				Log.i(TAG,"S_REDIRECT_READY");
    	       			VoiceCaptureClient voiceCaptureClient = new VoiceCaptureClient(server,Call.getPort());
    	       			voiceCaptureClient.start();
-   	       		}
-   	       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
+   	       		} 
+       			else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
    	       			// ignore
-   	       		}
+   	       		} 
+       			else if(msg.what == DirectoryCommand.S_CALL_DISCONNECT.getCode()) {
+       				Call.setState(Call.State.IDLE);
+		    		CharSequence text = Call.getUsername2() + " disconnected from the call";
+		    		Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG);
+		    		toast.show();
+		    		returnToDirectory();
+       			}
+       			else if(msg.what == DirectoryCommand.S_STATUS_OK.getCode()) {
+       				if(msg.obj.equals(DirectoryCommand.C_CALL_HANGUP)) {
+       					returnToDirectory();
+       				}
+       			}
    	       		else {
    	       			// unrecognized message
    	       			Log.e(TAG,"unrecognized message " + msg.what);
@@ -54,9 +67,15 @@ public class ActivityCallOngoing extends Activity {
         buttonCallEnd.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
             	// TODO: Code to end call (notify other caller, stop voice capture & voice player)
-            	
-            	
+            	dc.call_hangup();
             }
         });
+    }
+    
+    void returnToDirectory() {
+       	final Activity thisActivity = ActivityCallOngoing.this;
+		Intent directoryIntent = new Intent(thisActivity.getBaseContext(), ActivityDirectory.class);
+		directoryIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(directoryIntent);
     }
 }
