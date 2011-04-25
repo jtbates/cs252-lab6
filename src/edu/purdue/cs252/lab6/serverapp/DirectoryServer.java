@@ -421,31 +421,26 @@ public class DirectoryServer {
 			readyList.add(false);
 			final DatagramSocket redirectSocket = new DatagramSocket();
 			rSocketList.add(redirectSocket);
-
-			int minSize = 160; // must be the same as in VCC and VPS 
-			final byte[] buf=new byte[minSize];
-			final DatagramPacket packet = new DatagramPacket(buf, buf.length);
-
-			
-			while(!readyList.get(id)) {
-				try {
-					redirectSocket.receive(packet);
-					
-					readyList.set(id,true);
-					//nAddressList.add(packet.getAddress());
-					//nPortList.add(packet.getPort());
-					nSocketAddressList.add(packet.getSocketAddress());
-					
-					System.out.println(username + "'s first UDP packet");
-				} catch (IOException e) {
-					// try again
-				}
-			}
+			nSocketAddressList.add(new InetSocketAddress(0)); //placeholder
 			
 			Thread redirectThread = new Thread() {
 				@Override
 				public void run() {
-						
+					int minSize = 160; // must be the same as in VCC and VPS 
+					byte[] buf=new byte[minSize];
+					DatagramPacket packet = new DatagramPacket(buf, buf.length);
+					
+					while(!readyList.get(id)) {
+						try {
+							redirectSocket.receive(packet);
+							nSocketAddressList.set(id,packet.getSocketAddress());
+							readyList.set(id,true);
+							
+							System.out.println(username + "'s first UDP packet");
+						} catch (IOException e) {
+							// try again
+						}
+					}
 					while (!isInterrupted()) {
 						try {
 							//packet = new DatagramPacket(buf, buf.length);
