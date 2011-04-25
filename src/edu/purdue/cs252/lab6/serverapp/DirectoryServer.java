@@ -485,7 +485,7 @@ public class DirectoryServer {
 			}
 			
 			usernameList.remove(id);
-			socket.close();
+			if(!socket.isClosed()) socket.close();
 			rSocketList.remove(id);
 			nSocketAddressList.remove(id);
 			readyList.remove(id);
