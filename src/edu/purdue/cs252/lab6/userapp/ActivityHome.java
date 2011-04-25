@@ -1,9 +1,5 @@
 package edu.purdue.cs252.lab6.userapp;
 
-import org.apache.http.auth.AuthenticationException;
-
-import edu.purdue.cs252.lab6.DirectoryCommand;
-import edu.purdue.cs252.lab6.User;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -13,12 +9,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
+import edu.purdue.cs252.lab6.DirectoryCommand;
+import edu.purdue.cs252.lab6.User;
 
 public class ActivityHome extends Activity {
 	public static final String PREFS_NAME = "mySettingsFile";
@@ -26,18 +24,7 @@ public class ActivityHome extends Activity {
 	VoipApp appState = null;
 	
     public void myClickHandler(View view) {
-		switch (view.getId()) {
-		case R.id.Quit_Button:
-			finish();
-    		break;
-		case R.id.Settings:
-			Intent help = new Intent(ActivityHome.this, ActivitySettings.class);
-			startActivity(help);
-			break;
-		case R.id.Login:
 			Login(view);
-			break;
-		}
     }
 	
     public void Login(View v) {
@@ -107,6 +94,29 @@ public class ActivityHome extends Activity {
         ActivitySettings.userName = settings.getString("userName", "");
         ActivitySettings.serverName = settings.getString("serverName", "");
 
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.layout.menu, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.settings:
+        	Intent help = new Intent(ActivityHome.this, ActivitySettings.class);
+			startActivity(help);
+            return true;
+        case R.id.quit:
+            finish();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
     }
     
     
