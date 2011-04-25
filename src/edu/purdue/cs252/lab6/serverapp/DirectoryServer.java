@@ -421,42 +421,36 @@ public class DirectoryServer {
 			readyList.add(false);
 			final DatagramSocket redirectSocket = new DatagramSocket();
 			rSocketList.add(redirectSocket);
+			nSocketAddressList.add(new InetSocketAddress(0)); //placeholder
 			
-
 			Thread redirectThread = new Thread() {
 				@Override
 				public void run() {
-					int minSize = 17; // needs to be specified correctly
+					int minSize = 160; // must be the same as in VCC and VPS 
 					byte[] buf=new byte[minSize];
 					DatagramPacket packet = new DatagramPacket(buf, buf.length);
-
+					
 					while(!readyList.get(id)) {
 						try {
 							redirectSocket.receive(packet);
-							
+							nSocketAddressList.set(id,packet.getSocketAddress());
 							readyList.set(id,true);
-							//nAddressList.add(packet.getAddress());
-							//nPortList.add(packet.getPort());
-							nSocketAddressList.add(packet.getSocketAddress());
 							
 							System.out.println(username + "'s first UDP packet");
 						} catch (IOException e) {
 							// try again
 						}
 					}
-						
 					while (!isInterrupted()) {
 						try {
-							packet = new DatagramPacket(buf, buf.length);
+							//packet = new DatagramPacket(buf, buf.length);
 							redirectSocket.receive(packet);
 							System.out.println("Received UDP packet from " + username + " at (" + packet.getAddress() + "," + packet.getPort() + ")");
 							for(int i=0; i<usernameList.size();i++) {
 								if(i != id && readyList.get(i) == true) {
-									//packet.setSocketAddress(nAddressList.get(i));
 									packet.setSocketAddress(nSocketAddressList.get(i));
-									//packet.setPort(nPortList.get(i));
-									//packet.setPort(nSocketAddressList.get(i).getPort());
-									redirectSocket.send(packet);
+									DatagramSocket rSocket = rSocketList.get(i);
+									rSocket.send(packet);
 									System.out.println("Sending UDP packet to (" + packet.getAddress() + "," + packet.getPort() + ")");
 								}
 							}
@@ -468,7 +462,7 @@ public class DirectoryServer {
 					}
 				}
 			};
-			//threadList.add(redirectThread);
+			threadList.add(redirectThread);
 			redirectThread.start();
 		}
 		
@@ -501,6 +495,11 @@ public class DirectoryServer {
 			Client client_disconnecting = clientMap.get(user_disconnecting);
 			client_disconnecting.success(DirectoryCommand.C_CALL_HANGUP);			
 		}
+		
+		private class Caller {
+			
+		}
+		
 	}
 	
 	private void login(User user, ObjectOutputStream oos, ObjectInputStream ois) throws IOException, ClassNotFoundException {
