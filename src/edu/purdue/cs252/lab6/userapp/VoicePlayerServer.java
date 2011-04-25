@@ -12,6 +12,7 @@ import android.media.AudioTrack;
 import android.util.Log;
 
 public class VoicePlayerServer extends Thread {
+	private static final String TAG = "VPS";
 	static public DatagramSocket socket;
 
 	private int sampleRate = 8000;
@@ -50,7 +51,7 @@ public class VoicePlayerServer extends Thread {
 				// Read packet data and write to a speaker
 				buffer=packet.getData();
 				speaker.write(buffer,0,buffer.length);
-				
+				Log.i(TAG,"speaker write");
 				/*
 				Log.i("UDP", "VPS: Connecting...");
 				// Create new UDP-Socket 
