@@ -1,5 +1,6 @@
 package edu.purdue.cs252.lab6.userapp;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -70,8 +71,8 @@ public class VoicePlayerServer extends Thread {
 				Log.i("UDP", "VPS: Done.");
 				*/
 				
-			} catch (Exception e) {
-				Log.e("UDP", "VPS: Error", e);
+			} catch (IOException e) {
+				Log.e(TAG, "Error: "+ e);
 			}
 		}
 	}

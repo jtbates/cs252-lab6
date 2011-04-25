@@ -53,6 +53,7 @@ public class VoiceCaptureClient extends Thread {
 			
 			while(!isInterrupted()) {
 				try {
+					
 					byte[] buffer = buffers[ix++ % buffers.length];
 	
 					//Read data from mic into buf
@@ -85,7 +86,7 @@ public class VoiceCaptureClient extends Thread {
 					Log.i("UDP", "C: Done.");
 					*/
 				} catch (Exception e) {
-					Log.e("UDP", "C: Error", e);
+					Log.e(TAG, "C: Error", e);
 				}
 			}
 		}
