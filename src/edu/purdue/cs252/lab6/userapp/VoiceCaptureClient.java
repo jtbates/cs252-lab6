@@ -29,6 +29,9 @@ public class VoiceCaptureClient extends Thread {
 		super();
 		this.server = server;
 		this.port = port;
+		bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
+		buffer = new byte[bufferSize];
+
 	}
 	
 	public void run() {
@@ -43,7 +46,7 @@ public class VoiceCaptureClient extends Thread {
 		try {
 			InetAddress serverAddr = InetAddress.getByName(server);
 			DatagramSocket socket = new DatagramSocket();
-
+ 
 			// Loop forever recording input
 			while (true) {
 				// Read from the microphone
