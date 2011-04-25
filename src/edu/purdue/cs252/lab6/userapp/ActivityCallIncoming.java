@@ -93,6 +93,7 @@ public class ActivityCallIncoming extends Activity {
    	       		else if(msg.what == DirectoryCommand.S_REDIRECT_READY.getCode()) {
        				Log.i(TAG,"S_REDIRECT_READY");
    	       			VoiceCaptureClient voiceCaptureClient = new VoiceCaptureClient(server,Call.getPort());
+   	       			appState.setVoiceCaptureClient(voiceCaptureClient);
    	       			voiceCaptureClient.start();
    	       		}
    	       		else {
