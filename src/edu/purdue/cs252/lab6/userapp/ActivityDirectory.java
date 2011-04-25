@@ -2,33 +2,26 @@ package edu.purdue.cs252.lab6.userapp;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import edu.purdue.cs252.lab6.*;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-import android.view.View.OnClickListener;
+import android.widget.Spinner;
+import edu.purdue.cs252.lab6.DirectoryCommand;
+import edu.purdue.cs252.lab6.User;
+import edu.purdue.cs252.lab6.UserList;
 
 
 /*
@@ -38,12 +31,14 @@ import android.view.View.OnClickListener;
 public class ActivityDirectory extends ListActivity {
 	public static final int RESULT_INTERRUPTED = 1;
 	public static final int RESULT_FAILED = 2;
+	private String array_spinner[];
 
 	private DirectoryClient dc;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.directory);
 
         final VoipApp appState = (VoipApp) getApplicationContext(); 
         User user = appState.getUser();
@@ -52,6 +47,15 @@ public class ActivityDirectory extends ListActivity {
         final ConcurrentHashMap<String,User> userMap = new ConcurrentHashMap<String,User>();
        	final ArrayList<String> usernameList = new ArrayList<String>();
 		
+       	
+       	array_spinner = new String[2];
+		array_spinner[0] = "Alphabetical";
+		array_spinner[1] = "Elegant";
+		
+		final Spinner s = (Spinner)findViewById(R.id.sort_by);
+		ArrayAdapter<String> a = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, array_spinner);
+		s.setAdapter(a);
+       	
        	// Create an ArrayAdapter to user for our ListActivity
        	final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList);
        	final ListActivity thisActivity = this;
@@ -107,6 +111,21 @@ public class ActivityDirectory extends ListActivity {
        	dc.setReadHandler(handler);
 		dc.getDirectory();
 
+		final Button buttonCall = (Button) findViewById(R.id.ButtonLogout);
+        buttonCall.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            	// TODO: Logout	
+            	try {
+					dc.logout();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	Intent intent = new Intent();
+            	setResult(RESULT_OK, intent);
+            	finish();
+            }
+        });
        	
 
 		

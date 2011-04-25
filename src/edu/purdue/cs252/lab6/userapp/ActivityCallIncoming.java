@@ -1,8 +1,14 @@
 package edu.purdue.cs252.lab6.userapp;
 
-import edu.purdue.cs252.lab6.DirectoryCommand;
+import java.io.IOException;
+
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,14 +17,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import edu.purdue.cs252.lab6.DirectoryCommand;
 
 public class ActivityCallIncoming extends Activity {
 	static final private String TAG = "ACIncoming";
+	static MediaPlayer mMediaPlayer;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_incoming);
+        
+        Call.setState(Call.State.INCOMING);
         
         final String username2 = Call.getUsername2();
         
@@ -32,6 +42,33 @@ public class ActivityCallIncoming extends Activity {
        	final Activity thisActivity = ActivityCallIncoming.this;
        	
        	final String server = dc.getServer();
+       	
+       	Uri alert = RingtoneManager.getActualDefaultRingtoneUri(getBaseContext(),RingtoneManager.TYPE_RINGTONE); 
+        mMediaPlayer = new MediaPlayer();
+        try {
+			mMediaPlayer.setDataSource(this, alert);
+		
+			final AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+			if (audioManager.getStreamVolume(AudioManager.STREAM_RING) != 0) {
+				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
+				mMediaPlayer.setLooping(true);
+				mMediaPlayer.prepare();
+				mMediaPlayer.start();
+			}	
+					
+        } catch (IllegalArgumentException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalStateException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
        	
        	Handler callIncomingHandler = new Handler() {
        		public void handleMessage(Message msg) {
@@ -71,6 +108,8 @@ public class ActivityCallIncoming extends Activity {
         buttonCallAnswer.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
             	
+            	mMediaPlayer.stop();
+            	Call.setState(Call.State.ONGOING);
             	dc.call_answer(username2);
             	// Start the voice player server
             	//new Thread(new VoicePlayerServer()).start();
