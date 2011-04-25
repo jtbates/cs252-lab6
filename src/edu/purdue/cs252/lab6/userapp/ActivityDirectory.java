@@ -1,7 +1,8 @@
 package edu.purdue.cs252.lab6.userapp;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.app.AlertDialog;
@@ -15,10 +16,12 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.AdapterView.OnItemSelectedListener;
 import edu.purdue.cs252.lab6.DirectoryCommand;
 import edu.purdue.cs252.lab6.User;
 import edu.purdue.cs252.lab6.UserList;
@@ -47,19 +50,41 @@ public class ActivityDirectory extends ListActivity {
         final ConcurrentHashMap<String,User> userMap = new ConcurrentHashMap<String,User>();
        	final ArrayList<String> usernameList = new ArrayList<String>();
 		
-       	
-       	array_spinner = new String[2];
-		array_spinner[0] = "Alphabetical";
-		array_spinner[1] = "Elegant";
-		
 		final Spinner s = (Spinner)findViewById(R.id.sort_by);
-		ArrayAdapter<String> a = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, array_spinner);
+		final ArrayAdapter<CharSequence> a = ArrayAdapter.createFromResource(
+	            this, R.array.sort_by, android.R.layout.simple_spinner_item);
+
 		s.setAdapter(a);
-       	
-       	// Create an ArrayAdapter to user for our ListActivity
+		
+		// Create an ArrayAdapter to user for our ListActivity
+		Comparator<String> comparator = Collections.reverseOrder();
+		Collections.sort(usernameList,comparator);
        	final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList);
        	final ListActivity thisActivity = this;
 		thisActivity.setListAdapter(adapter);
+		
+		s.setOnItemSelectedListener(new OnItemSelectedListener(){
+			 	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+			 		String str = parent.getItemAtPosition(pos).toString();
+			 		if(!str.equals("A-Z")){
+			 			Comparator<String> comparator = Collections.reverseOrder();
+			 			Collections.sort(usernameList,comparator);
+			 			adapter.notifyDataSetChanged();
+			 		}
+			 		if(!str.equals("Z-A")){
+			 			
+			 			Collections.sort(usernameList);
+			 			adapter.notifyDataSetChanged();
+			 		}
+
+			 	}
+
+				public void onNothingSelected(AdapterView<?> view) {
+					// Do Nothing					
+				}
+		});
+       	
+       	
 		
         // get the directory client 
        	dc = appState.getDirectoryClient();
