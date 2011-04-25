@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:baselineAligned="true" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
+    <RelativeLayout android:id="@+id/relativeLayout1" android:layout_gravity="top" android:layout_height="wrap_content" android:layout_width="wrap_content">
+    </RelativeLayout>
+    <Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/voice" android:text="@string/Voicecall"></Button>
+    <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/chat" android:text="@string/message"></Button>
+</LinearLayout>

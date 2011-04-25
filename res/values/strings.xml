@@ -3,4 +3,7 @@
     <string name="hello">Hello World, Home!</string>
     <string name="app_name">lab6</string>
 <string name="buttonHandler">myClickHandler</string>
+<string name="VoiceCall"></string>
+<string name="Voicecall">Voice Call</string>
+<string name="message">Message</string>
 </resources>

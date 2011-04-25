@@ -16,6 +16,7 @@
         <activity android:name="ActivityCallIncoming"></activity>
         <activity android:name="ActivityCallOutgoing"></activity>
         <activity android:name="ActivityCallOngoing"></activity>
+        <activity android:name='ActivitySelectUser'></activity>
         <service android:name="RingerServer"></service>
     <activity android:name="ActivitySettings"></activity>
 </application>
