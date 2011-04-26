@@ -412,6 +412,7 @@ public class DirectoryServer {
 			Caller caller = new Caller(username);
 			if(caller.redirectSocket != null && !caller.redirectSocket.isClosed()) {
 				callerList.add(caller);
+				System.out.println(username + " connected to call");
 			}
 			else {
 				System.out.println("Failed to connect call for " + username);
