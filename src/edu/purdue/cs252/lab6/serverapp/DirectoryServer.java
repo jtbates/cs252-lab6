@@ -495,7 +495,17 @@ public class DirectoryServer {
 				if(!lSocket.isClosed()) lSocket.close();
 				callMap.remove(usernameList.get(0));
 			}
-			
+			boolean joined = false;
+			while(!joined) {
+				try {
+					threadList.get(id).join();
+					if(usernameList.size()==2) {
+						threadList.get(0).join();
+					}
+				} catch (InterruptedException e) {
+					// try again
+				}
+			}
 			usernameList.remove(id);
 			if(!socket.isClosed()) socket.close();
 			rSocketList.remove(id);
