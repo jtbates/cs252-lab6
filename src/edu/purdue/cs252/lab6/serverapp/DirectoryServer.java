@@ -487,6 +487,14 @@ public class DirectoryServer {
 					}
 				}
 			}
+
+			if(usernameList.size() == 2) {
+				readyList.set(0,false);
+				threadList.get(0).interrupt();
+				DatagramSocket lSocket = rSocketList.get(0);
+				if(!lSocket.isClosed()) lSocket.close();
+				callMap.remove(usernameList.get(0));
+			}
 			
 			usernameList.remove(id);
 			if(!socket.isClosed()) socket.close();
@@ -504,13 +512,6 @@ public class DirectoryServer {
 				System.out.println("Error informing " + user_disconnecting + " of successful call disconnect: " + e);
 			}
 			
-			if(usernameList.size() == 1) {
-				readyList.set(0,false);
-				threadList.get(0).interrupt();
-				DatagramSocket lSocket = rSocketList.get(0);
-				if(!lSocket.isClosed()) lSocket.close();
-				callMap.remove(usernameList.get(0));
-			}
 		}
 		
 	}
