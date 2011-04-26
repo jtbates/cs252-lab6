@@ -439,7 +439,7 @@ public class DirectoryServer {
 						
 						System.out.println(username + "'s first UDP packet");
 						
-						while (!isInterrupted()) {
+						while (!isInterrupted() && !redirectSocket.isClosed()) {
 							redirectSocket.receive(packet);
 							//System.out.println("Received UDP packet from " + username + " at (" + packet.getAddress() + "," + packet.getPort() + ")");
 							for(int i=0; i<usernameList.size();i++) {
@@ -477,8 +477,10 @@ public class DirectoryServer {
 						client.call_disconnect(user_disconnecting);
 					}
 					catch(IOException e) {
-						System.out.println("Error informing " + username + " of " + user_disconnecting + "'s call disconnect: " + e);
-						disconnect(username);
+						if(readyList.get(id) == true) {
+							System.out.println("Error informing " + username + " of " + user_disconnecting + "'s call disconnect: " + e);
+							disconnect(username);
+						}
 					}
 					if(i>id) {
 						idMap.put(username, i-1);
@@ -503,6 +505,7 @@ public class DirectoryServer {
 			}
 			
 			if(usernameList.size() == 1) {
+				readyList.set(0,false);
 				threadList.get(0).interrupt();
 				DatagramSocket lSocket = rSocketList.get(0);
 				if(!lSocket.isClosed()) lSocket.close();
