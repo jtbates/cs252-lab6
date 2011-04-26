@@ -502,6 +502,7 @@ public class DirectoryServer {
 					if(usernameList.size()==2) {
 						threadList.get(0).join();
 					}
+					joined=true;
 				} catch (InterruptedException e) {
 					// try again
 				}
