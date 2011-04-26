@@ -94,5 +94,9 @@ public class VoiceCaptureClient extends Thread {
 			Log.e(TAG,e.toString());
 			this.interrupt();
 		}
+		catch(IllegalStateException e) {
+			Log.e(TAG,e.toString());
+			this.interrupt();
+		}
 	}
 }

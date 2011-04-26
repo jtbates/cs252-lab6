@@ -439,7 +439,7 @@ public class DirectoryServer {
 						
 						System.out.println(username + "'s first UDP packet");
 						
-						while (!isInterrupted()) {
+						while (!isInterrupted() && !redirectSocket.isClosed()) {
 							redirectSocket.receive(packet);
 							//System.out.println("Received UDP packet from " + username + " at (" + packet.getAddress() + "," + packet.getPort() + ")");
 							for(int i=0; i<usernameList.size();i++) {
@@ -453,9 +453,11 @@ public class DirectoryServer {
 						}
 					}
 					catch (IOException e) {
-						System.out.println("UDP Redirect Error for " + username + ": " + e);
-						e.printStackTrace();
-						disconnect(username);
+						if(readyList.get(id) == true) {
+							System.out.println("UDP Redirect Error for " + username + ": " + e);
+							e.printStackTrace();
+							disconnect(username);
+						}
 					}
 				}
 			};
@@ -465,6 +467,8 @@ public class DirectoryServer {
 		
 		synchronized void disconnect(String user_disconnecting) {
 			int id = idMap.get(user_disconnecting);
+			readyList.set(id,false);
+			threadList.get(id).interrupt();
 			DatagramSocket socket = rSocketList.get(id);
 			
 			for(int i=0;i<usernameList.size();i++) {
@@ -483,13 +487,31 @@ public class DirectoryServer {
 					}
 				}
 			}
-			
+
+			if(usernameList.size() == 2) {
+				readyList.set(0,false);
+				threadList.get(0).interrupt();
+				DatagramSocket lSocket = rSocketList.get(0);
+				if(!lSocket.isClosed()) lSocket.close();
+				callMap.remove(usernameList.get(0));
+			}
+			boolean joined = false;
+			while(!joined) {
+				try {
+					threadList.get(id).join();
+					if(usernameList.size()==2) {
+						threadList.get(0).join();
+					}
+					joined=true;
+				} catch (InterruptedException e) {
+					// try again
+				}
+			}
 			usernameList.remove(id);
-			socket.close();
+			if(!socket.isClosed()) socket.close();
 			rSocketList.remove(id);
 			nSocketAddressList.remove(id);
 			readyList.remove(id);
-			threadList.get(id).interrupt();
 			threadList.remove(id);
 			callMap.remove(user_disconnecting);
 			
@@ -501,11 +523,6 @@ public class DirectoryServer {
 				System.out.println("Error informing " + user_disconnecting + " of successful call disconnect: " + e);
 			}
 			
-			if(usernameList.size() == 1) {
-				rSocketList.get(0).close();
-				threadList.get(0).interrupt();
-				callMap.remove(usernameList.get(0));
-			}
 		}
 		
 	}
