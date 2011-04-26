@@ -397,7 +397,11 @@ public class DirectoryServer {
 			System.out.println("getRedirectPort for " + username);
 			for(Caller c : callerList) {
 				System.out.println(c.username);
-				if(c.username.equals(username)) return c.redirectSocket.getPort();
+				if(c.username.equals(username)) {
+					int port = c.redirectSocket.getPort();
+					System.out.println("Port: " + port);
+					return port;
+				}
 			}
 			System.out.println("getRedirectPort end");
 			return -1;
