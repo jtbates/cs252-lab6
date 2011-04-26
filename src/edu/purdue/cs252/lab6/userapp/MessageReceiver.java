@@ -17,9 +17,9 @@ public class MessageReceiver extends Thread {
 	public void run () {
 		while(!isInterrupted()) {
 			try {
-				//Read from IO steam
-				
-				//Write to application
+				// Read packet
+					
+				// Write to application window
 				
 			}
 			catch (Exception e) {
