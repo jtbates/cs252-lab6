@@ -476,6 +476,7 @@ public class DirectoryServer {
 				this.username = uname;
 				try {
 					this.redirectSocket = new DatagramSocket();
+					System.out.println("constructor port: " + redirectSocket.getPort());
 				}
 				catch(SocketException e) {
 					System.out.println("Error making Caller for " + uname + ": " + e);
