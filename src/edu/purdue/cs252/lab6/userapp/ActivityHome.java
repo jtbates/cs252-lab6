@@ -24,7 +24,18 @@ public class ActivityHome extends Activity {
 	VoipApp appState = null;
 	
     public void myClickHandler(View view) {
+		switch (view.getId()) {
+		case R.id.Quit_Button:
+			finish();
+    		break;
+		case R.id.Settings:
+			Intent help = new Intent(ActivityHome.this, ActivitySettings.class);
+			startActivity(help);
+			break;
+		case R.id.Login:
 			Login(view);
+			break;
+		}
     }
 	
     public void Login(View v) {

@@ -43,7 +43,7 @@ public class ActivityDirectory extends ListActivity {
         setContentView(R.layout.directory);
 
         final VoipApp appState = (VoipApp) getApplicationContext(); 
-        User user = appState.getUser();
+        final User user = appState.getUser();
         Log.d("Login", user.getUserName());
         
         final ConcurrentHashMap<String,User> userMap = new ConcurrentHashMap<String,User>();
@@ -98,6 +98,7 @@ public class ActivityDirectory extends ListActivity {
    	       			
 					adapter.clear();
 					for(String username2 : userMap.keySet()) {
+						if(!user.getUserName().equals(username2))
 						adapter.add(username2);
 						Log.i("AD","directory: " + username2);
 					}
