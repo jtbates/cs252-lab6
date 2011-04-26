@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 
 import edu.purdue.cs252.lab6.*;
@@ -384,10 +385,10 @@ public class DirectoryServer {
 	}
 
 	private class Call {
-		ArrayList<Caller> callerList;
+		CopyOnWriteArrayList<Caller> callerList;
 		
 		Call(String username1, String username2) throws IOException {
-			this.callerList = new ArrayList<Caller>();
+			this.callerList = new CopyOnWriteArrayList<Caller>();
 			
 			connect(username1);
 			connect(username2);
@@ -407,7 +408,7 @@ public class DirectoryServer {
 			return -1;
 		}
 		
-		ArrayList<Caller> getCallerList() {
+		CopyOnWriteArrayList<Caller> getCallerList() {
 			return callerList;
 		}
 		
