@@ -394,11 +394,12 @@ public class DirectoryServer {
 		}
 		
 		int getRedirectPort(String username) {
-			System.out.println(username);
+			System.out.println("getRedirectPort for " + username);
 			for(Caller c : callerList) {
 				System.out.println(c.username);
 				if(c.username.equals(username)) return c.redirectSocket.getPort();
 			}
+			System.out.println("getRedirectPort end");
 			return -1;
 		}
 		
@@ -410,7 +411,7 @@ public class DirectoryServer {
 			return usernameList;
 		}*/
 		
-		synchronized void connect(final String username) throws IOException {
+		synchronized void connect(String username) throws IOException {
 			Caller caller = new Caller(username);
 			if(caller.redirectSocket != null && !caller.redirectSocket.isClosed()) {
 				callerList.add(caller);
