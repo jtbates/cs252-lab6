@@ -453,9 +453,11 @@ public class DirectoryServer {
 						}
 					}
 					catch (IOException e) {
-						System.out.println("UDP Redirect Error for " + username + ": " + e);
-						e.printStackTrace();
-						disconnect(username);
+						if(readyList.get(id) == true) {
+							System.out.println("UDP Redirect Error for " + username + ": " + e);
+							e.printStackTrace();
+							disconnect(username);
+						}
 					}
 				}
 			};
@@ -477,10 +479,8 @@ public class DirectoryServer {
 						client.call_disconnect(user_disconnecting);
 					}
 					catch(IOException e) {
-						if(readyList.get(id) == true) {
-							System.out.println("Error informing " + username + " of " + user_disconnecting + "'s call disconnect: " + e);
-							disconnect(username);
-						}
+						System.out.println("Error informing " + username + " of " + user_disconnecting + "'s call disconnect: " + e);
+						disconnect(username);
 					}
 					if(i>id) {
 						idMap.put(username, i-1);
