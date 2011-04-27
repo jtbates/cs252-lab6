@@ -216,7 +216,7 @@ public class DirectoryServer {
 			else {
 				call = new Call(username,username2);
 				callMap.put(username, call);
-
+				call_redirectReady();
 				client2.call_accepted(username);
 			}
 		}
@@ -311,7 +311,7 @@ public class DirectoryServer {
 					oos.writeObject(DirectoryCommand.S_CALL_ACCEPTED);
 					oos.flush();
 				}
-
+				call_redirectReady();
 			}
 		}
 		
@@ -323,9 +323,10 @@ public class DirectoryServer {
 			}
 		}
 		
-		public void call_redirectReady(int port) throws IOException {
+		public void call_redirectReady() throws IOException {
 			synchronized(oos) {
 				oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
+				int port = call.getRedirectPort(username);
 				oos.writeInt(port);
 				oos.flush();
 				System.out.println("S_REDIRECT_INIT " + port + " to " + username);
@@ -406,10 +407,6 @@ public class DirectoryServer {
 			return callerList;
 		}
 		
-		/*ArrayList<String> getUsernameList() {
-			return usernameList;
-		}*/
-		
 		synchronized void connect(String username) throws IOException {
 			try {
 				new Caller(username);
@@ -462,11 +459,14 @@ public class DirectoryServer {
 			public DatagramSocket redirectSocket; // redirect Socket
 			public SocketAddress nSocketAddress; // NAT address
 			public Thread redirectThread;
-			
+			public boolean ready;
+			public boolean close;
 			
 			Caller(String uname) throws SocketException {
 				final Caller thisCaller = this;
 				this.username = uname;
+				this.ready = false;
+				this.close = false;
 				
 				this.redirectSocket = new DatagramSocket();
 				System.out.println("constructor port: " + redirectSocket.getLocalPort());
@@ -481,10 +481,10 @@ public class DirectoryServer {
 						try {
 							redirectSocket.receive(packet);
 							
-							clientMap.get(username).call_redirectReady(redirectSocket.getLocalPort());
-							
 							nSocketAddress = packet.getSocketAddress();
 							callerList.add(thisCaller);
+
+							ready = true;
 							
 							System.out.println(username + "'s first UDP packet");
 							
@@ -502,12 +502,16 @@ public class DirectoryServer {
 							if(callerList.contains(thisCaller)) {
 								System.out.println("UDP Redirect Error for " + username + ": " + e);
 								e.printStackTrace();
+								close = true;
 								disconnect(username);
 							}
 						}
 					}
 				};
 				redirectThread.start();
+				while(!ready && !close) {
+					Thread.yield();
+				}
 			}
 			
 		}
