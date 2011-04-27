@@ -378,6 +378,7 @@ public class DirectoryServer {
 
 	private class Call {
 		CopyOnWriteArrayList<Caller> callerList;
+		CopyOnWriteArrayList<DatagramSocket> socketList;
 		
 		Call(String username1, String username2) throws IOException {
 			this.callerList = new CopyOnWriteArrayList<Caller>();
@@ -417,6 +418,7 @@ public class DirectoryServer {
 		synchronized void disconnect(String user_disconnecting) {
 			for (Caller c : callerList) {
 				if(c.username.equals(user_disconnecting)) {
+					socketList.remove(c.redirectSocket);
 					callerList.remove(c);
 					callMap.remove(user_disconnecting);
 					c.redirectThread.interrupt();
@@ -463,6 +465,7 @@ public class DirectoryServer {
 				this.username = uname;
 				
 				this.redirectSocket = new DatagramSocket();
+				
 				System.out.println("constructor port: " + redirectSocket.getLocalPort());
 				clientMap.get(uname).call_redirectReady(redirectSocket.getLocalPort());
 				
@@ -477,17 +480,26 @@ public class DirectoryServer {
 							redirectSocket.receive(packet);
 							
 							nSocketAddress = packet.getSocketAddress();
+							redirectSocket.connect(nSocketAddress);
+							socketList.add(redirectSocket);
+							
 							System.out.println(username + "'s first UDP packet");
-							callerList.add(thisCaller);
+							
 							
 							while (!isInterrupted()) {
 								redirectSocket.receive(packet);
-								for(Caller c : callerList) {
-									if(c != thisCaller) {
+								for(DatagramSocket socket2 : socketList) {
+									if(socket2 != redirectSocket) {
+										packet.setSocketAddress(socket2.getRemoteSocketAddress());
+										socket2.send(packet);
+									}
+								}
+								/*for(Caller c : callerList) {
+									if(c != thisCaller && c.ready) {
 										packet.setSocketAddress(c.nSocketAddress);
 										c.redirectSocket.send(packet);
 									}
-								}
+								}*/
 							}
 						}
 						catch (IOException e) {
@@ -500,6 +512,8 @@ public class DirectoryServer {
 					}
 				};
 				redirectThread.start();
+				callerList.add(thisCaller);
+				
 			}
 			
 		}
