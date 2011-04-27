@@ -218,14 +218,6 @@ public class DirectoryServer {
 				callMap.put(username, call);
 
 				client2.call_accepted(username);
-				
-				synchronized(oos) {
-					oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
-					int port = call.getRedirectPort(username);
-					oos.writeInt(port);
-					oos.flush();
-					System.out.println("S_REDIRECT_INIT " + port + " to " + username);
-				}
 			}
 		}
 		
@@ -320,13 +312,6 @@ public class DirectoryServer {
 					oos.flush();
 				}
 
-				synchronized(oos) {
-					oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
-					int port = call.getRedirectPort(username);
-					oos.writeInt(port);
-					oos.flush();
-					System.out.println("S_REDIRECT_INIT " + port + " to " + username);
-				}
 			}
 		}
 		
@@ -335,6 +320,15 @@ public class DirectoryServer {
 				oos.writeObject(DirectoryCommand.S_CALL_DISCONNECT);
 				oos.writeObject(username2);
 				oos.flush();
+			}
+		}
+		
+		public void call_redirectReady(int port) throws IOException {
+			synchronized(oos) {
+				oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
+				oos.writeInt(port);
+				oos.flush();
+				System.out.println("S_REDIRECT_INIT " + port + " to " + username);
 			}
 		}
 		
@@ -486,6 +480,9 @@ public class DirectoryServer {
 						
 						try {
 							redirectSocket.receive(packet);
+							
+							clientMap.get(username).call_redirectReady(redirectSocket.getLocalPort());
+							
 							nSocketAddress = packet.getSocketAddress();
 							callerList.add(thisCaller);
 							
@@ -512,6 +509,7 @@ public class DirectoryServer {
 				};
 				redirectThread.start();
 			}
+			
 		}
 	}
 	
