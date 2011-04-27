@@ -35,7 +35,13 @@ public class ActivityDirectory extends ListActivity {
 	public static final int RESULT_INTERRUPTED = 1;
 	public static final int RESULT_FAILED = 2;
 
+	
 	private DirectoryClient dc;
+
+    @Override
+    protected void onPause(){
+    	finish();
+    }
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -231,7 +237,7 @@ public class ActivityDirectory extends ListActivity {
     	// TODO: display notification if call fails
     }
     
-    
+
     
     /*private class IncomingCallReceiver extends BroadcastReceiver {
 

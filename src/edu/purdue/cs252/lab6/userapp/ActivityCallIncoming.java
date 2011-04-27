@@ -23,6 +23,13 @@ public class ActivityCallIncoming extends Activity {
 	static final private String TAG = "ACIncoming";
 	MediaPlayer mMediaPlayer;
     /** Called when the activity is first created. */
+	
+	@Override
+    protected void onPause(){
+    	finish();
+    }
+	
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

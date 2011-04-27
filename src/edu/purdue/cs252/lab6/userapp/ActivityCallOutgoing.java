@@ -15,6 +15,13 @@ import android.widget.TextView;
 public class ActivityCallOutgoing extends Activity {
 	private static final String TAG = "ACOutgoing";
     /** Called when the activity is first created. */
+	
+	@Override
+    protected void onPause(){
+    	finish();
+    }
+	
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
