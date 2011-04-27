@@ -115,7 +115,7 @@ public class ActivityCallIncoming extends Activity {
         	public void onClick(View v) {
         		mMediaPlayer.stop();
         		dc.call_reject(username2);
-        		
+        		finish();
         	}
         });
        
