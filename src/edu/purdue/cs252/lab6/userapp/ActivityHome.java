@@ -14,6 +14,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.Toast;
 import edu.purdue.cs252.lab6.DirectoryCommand;
 import edu.purdue.cs252.lab6.User;
@@ -22,21 +24,6 @@ public class ActivityHome extends Activity {
 	public static final String PREFS_NAME = "mySettingsFile";
 
 	VoipApp appState = null;
-	
-    public void myClickHandler(View view) {
-		switch (view.getId()) {
-		case R.id.Quit_Button:
-			finish();
-    		break;
-		case R.id.Settings:
-			Intent help = new Intent(ActivityHome.this, ActivitySettings.class);
-			startActivity(help);
-			break;
-		case R.id.Login:
-			Login(view);
-			break;
-		}
-    }
 	
     public void Login(View v) {
     	// Set directory server
@@ -104,6 +91,13 @@ public class ActivityHome extends Activity {
         SharedPreferences settings = getSharedPreferences(ActivityHome.PREFS_NAME, 0);
         ActivitySettings.userName = settings.getString("userName", "");
         ActivitySettings.serverName = settings.getString("serverName", "");
+        
+        final Button buttonLogin = (Button) findViewById(R.id.Login);
+        buttonLogin.setOnClickListener(new OnClickListener() {
+        	public void onClick(View v) {
+        		Login(v);
+        	}
+        });
 
     }
     
@@ -123,7 +117,7 @@ public class ActivityHome extends Activity {
 			startActivity(help);
             return true;
         case R.id.quit:
-            finish();
+        	finish();
             return true;
         default:
             return super.onOptionsItemSelected(item);

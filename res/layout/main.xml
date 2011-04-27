@@ -1,37 +1,20 @@
 <RelativeLayout 
 	android:id="@+id/RelativeLayout01" 
-	xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent">
+	xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent" android:background="@drawable/background">
 	
 <TableLayout 
 	android:id="@+id/TableLayout01" 
 	android:layout_height="wrap_content"
 	android:orientation="vertical"
-	android:layout_centerHorizontal="true" android:layout_width="200px" android:layout_alignParentBottom="true">
+	android:layout_centerHorizontal="true" android:layout_width="fill_parent" android:layout_alignParentBottom="true">
+	<Button 
+		android:layout_below="@+id/TableLayout01" 
+		android:layout_height="wrap_content" 
+		android:layout_centerHorizontal="true" android:layout_width="fill_parent" android:onClick="@string/buttonHandler" android:id="@+id/Login" android:text="Login">
+	</Button>
 
 
-
-
-<Button 
-	android:layout_below="@+id/TableLayout01" 
-	android:layout_height="wrap_content" 
-	android:layout_centerHorizontal="true" android:layout_width="wrap_content" android:onClick="@string/buttonHandler" android:id="@+id/Login" android:text="Login">
-</Button>
-
-<Button 
-	android:layout_width="wrap_content" 
-	android:layout_below="@+id/Button02" 
-	android:layout_height="wrap_content" 
-	android:layout_centerHorizontal="true" android:onClick="@string/buttonHandler" android:id="@+id/Settings" android:text="Settings">
-</Button>
-
-<Button 
-	android:layout_width="wrap_content" 
-	android:layout_height="wrap_content" 
-	android:onClick="@string/buttonHandler" android:id="@+id/Quit_Button" android:text="Quit">
-</Button>
-
-
-</TableLayout>
+	</TableLayout>
 
 
 </RelativeLayout>
