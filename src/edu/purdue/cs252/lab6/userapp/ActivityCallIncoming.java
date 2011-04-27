@@ -24,11 +24,6 @@ public class ActivityCallIncoming extends Activity {
 	MediaPlayer mMediaPlayer;
     /** Called when the activity is first created. */
 	
-	@Override
-    protected void onPause(){
-    	finish();
-    }
-	
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,8 +118,7 @@ public class ActivityCallIncoming extends Activity {
         		mMediaPlayer.stop();
         		dc.call_reject(username2);
 	       		Call.setState(Call.State.IDLE);
-	       		Intent directoryIntent = new Intent(v.getContext(), ActivityDirectory.class);
-	       		startActivity(directoryIntent);
+	       		finish();
         	}
         });
        

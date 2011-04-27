@@ -29,30 +29,76 @@ import edu.purdue.cs252.lab6.UserList;
 
 /*
  * Class that contains the directory information after the user has logged in
- * The layout displayed is directory.xml
+ * The layout displayed is directory.xmll
  */
 public class ActivityDirectory extends ListActivity {
 	public static final int RESULT_INTERRUPTED = 1;
 	public static final int RESULT_FAILED = 2;
-
-	
 	private DirectoryClient dc;
 
-    @Override
-    protected void onPause(){
-    	finish();
-    }
 	
+	ConcurrentHashMap<String,User> userMap;
+	VoipApp appState;
+	User user;
+	ArrayAdapter<String> adapter;
+	
+	private	Handler handler = new Handler() {
+   		public void handleMessage(Message msg) {
+   			Log.i("AH","adHandler");
+	       		if(msg.what == DirectoryCommand.S_DIRECTORY_SEND.getCode()) {
+	       			userMap.clear();
+				//userMap.putAll((Map<String,User>)msg.obj);
+	       			//ArrayList<User> users = (ArrayList<User>)msg.obj;
+	       			UserList uList = (UserList)msg.obj;
+				for(int i=0; i<uList.size(); i++) {
+					User u = uList.get(i);
+					userMap.put(u.getUserName(),u);
+				}
+	       			
+				adapter.clear();
+				for(String username2 : userMap.keySet()) {
+					if(!user.getUserName().equals(username2))
+					adapter.add(username2);
+					Log.i("AD","directory: " + username2);
+				}
+	       		}
+	       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDIN.getCode()) {
+	       			User user2 = (User)msg.obj;
+	       			String username2 = user2.getUserName();
+	       			userMap.put(username2, user2);
+	       			adapter.add(username2);
+	       		}
+	       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDOUT.getCode()) {
+	       			String username2 = (String)msg.obj;
+	       			userMap.remove(username2);
+	       			adapter.remove(username2);
+	       		}
+	       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
+	       			String username2 = (String)msg.obj;
+	       			Call.setUsername2(username2);
+	       			Call.setState(Call.State.INCOMING);
+	       			Intent callIncomingIntent = new Intent(ActivityDirectory.this, ActivityCallIncoming.class);
+	       			callIncomingIntent.putExtra("username2",username2);
+	       			startActivity(callIncomingIntent);
+	       		}
+	       		else {
+	       			Log.e("AD","unrecognized message " + msg.what);
+	       			// unrecognized message
+	       			// TODO: handle error
+	       		}
+   		}
+   	};
+   	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.directory);
 
-        final VoipApp appState = (VoipApp) getApplicationContext(); 
-        final User user = appState.getUser();
+        appState = (VoipApp) getApplicationContext(); 
+        user = appState.getUser();
         Log.d("Login", user.getUserName());
         
-        final ConcurrentHashMap<String,User> userMap = new ConcurrentHashMap<String,User>();
+        userMap = new ConcurrentHashMap<String,User>();
        	final ArrayList<String> usernameList = new ArrayList<String>();
        	
        	final Spinner s = (Spinner)findViewById(R.id.sort_by);
@@ -64,7 +110,7 @@ public class ActivityDirectory extends ListActivity {
        	// Create an ArrayAdapter to user for our ListActivity
        	Comparator<String> comparator = Collections.reverseOrder();
        	Collections.sort(usernameList,comparator);
-       	final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList);
+       	adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usernameList);
        	final ListActivity thisActivity = this;
 		thisActivity.setListAdapter(adapter);
 		
@@ -89,70 +135,22 @@ public class ActivityDirectory extends ListActivity {
 		
         // get the directory client 
        	dc = appState.getDirectoryClient();
-       	Handler handler = new Handler() {
-       		public void handleMessage(Message msg) {
-       			Log.i("AH","adHandler");
-   	       		if(msg.what == DirectoryCommand.S_DIRECTORY_SEND.getCode()) {
-   	       			userMap.clear();
-					//userMap.putAll((Map<String,User>)msg.obj);
-   	       			//ArrayList<User> users = (ArrayList<User>)msg.obj;
-   	       			UserList uList = (UserList)msg.obj;
-					for(int i=0; i<uList.size(); i++) {
-						User u = uList.get(i);
-						userMap.put(u.getUserName(),u);
-					}
-   	       			
-					adapter.clear();
-					for(String username2 : userMap.keySet()) {
-						if(!user.getUserName().equals(username2))
-						adapter.add(username2);
-						Log.i("AD","directory: " + username2);
-					}
-   	       		}
-   	       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDIN.getCode()) {
-   	       			User user2 = (User)msg.obj;
-   	       			String username2 = user2.getUserName();
-   	       			userMap.put(username2, user2);
-   	       			adapter.add(username2);
-   	       		}
-   	       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDOUT.getCode()) {
-   	       			String username2 = (String)msg.obj;
-   	       			userMap.remove(username2);
-   	       			adapter.remove(username2);
-   	       		}
-   	       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
-   	       			String username2 = (String)msg.obj;
-   	       			Call.setUsername2(username2);
-   	       			Call.setState(Call.State.INCOMING);
-   	       			Intent callIncomingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallIncoming.class);
-   	       			callIncomingIntent.putExtra("username2",username2);
-   	       			startActivity(callIncomingIntent);
-   	       		}
-   	       		else {
-   	       			Log.e("AD","unrecognized message " + msg.what);
-   	       			// unrecognized message
-   	       			// TODO: handle error
-   	       		}
-       		}
-       	};
        	dc.setReadHandler(handler);
 		dc.getDirectory();
 
-       	
 		final Button buttonCall = (Button) findViewById(R.id.ButtonLogout);
         buttonCall.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-             // TODO: Logout
-             try {
-            	 dc.logout();
-             } catch (Exception e) {
-            	 // TODO Auto-generated catch block
-            	 e.printStackTrace();
-             }
-             Intent intent = new Intent();
-             setResult(RESULT_OK, intent);
-             Intent menuIntent = new Intent(thisActivity.getBaseContext(), ActivityHome.class);
-       		 startActivity(menuIntent);
+            	// TODO: Logout
+            	try {
+            	 	dc.logout();
+             	} catch (Exception e) {
+            	 	// TODO Auto-generated catch block
+            	 	e.printStackTrace();
+             	}
+             	Intent intent = new Intent();
+             	setResult(RESULT_OK, intent);
+             	finish();
             }
         });
 		

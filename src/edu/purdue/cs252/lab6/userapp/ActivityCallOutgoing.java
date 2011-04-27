@@ -16,11 +16,6 @@ public class ActivityCallOutgoing extends Activity {
 	private static final String TAG = "ACOutgoing";
     /** Called when the activity is first created. */
 	
-	@Override
-    protected void onPause(){
-    	finish();
-    }
-	
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,8 +38,7 @@ public class ActivityCallOutgoing extends Activity {
    	       		else if (msg.what == DirectoryCommand.S_CALL_REJECT.getCode()) {
    	       			Log.i(TAG, "call rejected");
    	       			Call.setState(Call.State.IDLE);
-   	       			Intent directoryIntent = new Intent(thisActivity.getBaseContext(), ActivityDirectory.class);
-   	       			startActivity(directoryIntent);
+   	       			finish();
    	       		}
    	       		else if(msg.what == DirectoryCommand.S_REDIRECT_INIT.getCode()) {
    	       			try {
