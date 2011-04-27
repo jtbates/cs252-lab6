@@ -35,59 +35,63 @@ public class ActivityDirectory extends ListActivity {
 	public static final int RESULT_INTERRUPTED = 1;
 	public static final int RESULT_FAILED = 2;
 	private DirectoryClient dc;
-
+	private Handler handler;
 	
 	ConcurrentHashMap<String,User> userMap;
 	VoipApp appState;
 	User user;
 	ArrayAdapter<String> adapter;
 	
-	private	Handler handler = new Handler() {
-   		public void handleMessage(Message msg) {
-   			Log.i("AH","adHandler");
-	       		if(msg.what == DirectoryCommand.S_DIRECTORY_SEND.getCode()) {
-	       			userMap.clear();
-				//userMap.putAll((Map<String,User>)msg.obj);
-	       			//ArrayList<User> users = (ArrayList<User>)msg.obj;
-	       			UserList uList = (UserList)msg.obj;
-				for(int i=0; i<uList.size(); i++) {
-					User u = uList.get(i);
-					userMap.put(u.getUserName(),u);
-				}
-	       			
-				adapter.clear();
-				for(String username2 : userMap.keySet()) {
-					if(!user.getUserName().equals(username2))
-					adapter.add(username2);
-					Log.i("AD","directory: " + username2);
-				}
-	       		}
-	       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDIN.getCode()) {
-	       			User user2 = (User)msg.obj;
-	       			String username2 = user2.getUserName();
-	       			userMap.put(username2, user2);
-	       			adapter.add(username2);
-	       		}
-	       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDOUT.getCode()) {
-	       			String username2 = (String)msg.obj;
-	       			userMap.remove(username2);
-	       			adapter.remove(username2);
-	       		}
-	       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
-	       			String username2 = (String)msg.obj;
-	       			Call.setUsername2(username2);
-	       			Call.setState(Call.State.INCOMING);
-	       			Intent callIncomingIntent = new Intent(ActivityDirectory.this, ActivityCallIncoming.class);
-	       			callIncomingIntent.putExtra("username2",username2);
-	       			startActivity(callIncomingIntent);
-	       		}
-	       		else {
-	       			Log.e("AD","unrecognized message " + msg.what);
-	       			// unrecognized message
-	       			// TODO: handle error
-	       		}
-   		}
-   	};
+	
+	public void createHandler() {
+		handler = new Handler() {
+	   		public void handleMessage(Message msg) {
+	   			Log.i("AH","adHandler");
+		       		if(msg.what == DirectoryCommand.S_DIRECTORY_SEND.getCode()) {
+		       			userMap.clear();
+					//userMap.putAll((Map<String,User>)msg.obj);
+		       			//ArrayList<User> users = (ArrayList<User>)msg.obj;
+		       			UserList uList = (UserList)msg.obj;
+					for(int i=0; i<uList.size(); i++) {
+						User u = uList.get(i);
+						userMap.put(u.getUserName(),u);
+					}
+		       			
+					adapter.clear();
+					for(String username2 : userMap.keySet()) {
+						if(!user.getUserName().equals(username2))
+						adapter.add(username2);
+						Log.i("AD","directory: " + username2);
+					}
+		       		}
+		       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDIN.getCode()) {
+		       			User user2 = (User)msg.obj;
+		       			String username2 = user2.getUserName();
+		       			userMap.put(username2, user2);
+		       			adapter.add(username2);
+		       		}
+		       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDOUT.getCode()) {
+		       			String username2 = (String)msg.obj;
+		       			userMap.remove(username2);
+		       			adapter.remove(username2);
+		       		}
+		       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
+		       			String username2 = (String)msg.obj;
+		       			Call.setUsername2(username2);
+		       			Call.setState(Call.State.INCOMING);
+		       			Intent callIncomingIntent = new Intent(ActivityDirectory.this, ActivityCallIncoming.class);
+		       			callIncomingIntent.putExtra("username2",username2);
+		       			startActivity(callIncomingIntent);
+		       		}
+		       		else {
+		       			Log.e("AD","unrecognized message " + msg.what);
+		       			// unrecognized message
+		       			// TODO: handle error
+		       		}
+	   		}
+	   	};
+	}
+	
    	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -132,6 +136,7 @@ public class ActivityDirectory extends ListActivity {
 				// Do Nothing
 			}		
 		});
+		createHandler();
 		
         // get the directory client 
        	dc = appState.getDirectoryClient();
@@ -224,11 +229,13 @@ public class ActivityDirectory extends ListActivity {
 	@Override
     public void onResume() {
     	super.onResume();
+    	createHandler();
     	/*
     	// Capture ACTION_INCOMINGCALL broadcast
     	IntentFilter intentFilter = new IntentFilter(RingerServer.ACTION_INCOMINGCALL);
     	registerReceiver(new IncomingCallReceiver(),intentFilter);*/
     }
+	
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	super.onActivityResult(requestCode, resultCode, data);
