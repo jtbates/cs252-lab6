@@ -17,12 +17,16 @@ public class VoiceCaptureClient extends Thread {
 	private int rPort; // redirect port
 	//private final int lPort = 25202; // local port
 	
+	AudioRecord recorder;
 	private int sampleRate = 8000;
 	private int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 	
+	private boolean close;
+	
 	VoiceCaptureClient(String server, int port) {
 		super();
+		this.close=false;
 		this.server = server;
 		this.rPort = port;
 		VoiceCaptureClient.socket = VoicePlayerServer.socket;
@@ -33,7 +37,6 @@ public class VoiceCaptureClient extends Thread {
 			android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);		
 			
 			// Initialize
-			AudioRecord recorder = null;
 			byte[][] buffers = new byte[256][160];
 			int ix = 0;
 			DatagramPacket packet;
@@ -51,7 +54,7 @@ public class VoiceCaptureClient extends Thread {
 	
 			recorder.startRecording();
 			
-			while(!isInterrupted()) {
+			while(!close) {
 				try {
 					
 					byte[] buffer = buffers[ix++ % buffers.length];
@@ -97,6 +100,12 @@ public class VoiceCaptureClient extends Thread {
 		catch(IllegalStateException e) {
 			Log.e(TAG,e.toString());
 			this.interrupt();
+		}
+	}
+	public void close() {
+		close=true;
+		if(recorder != null) {
+			recorder.release();
 		}
 	}
 	

@@ -16,18 +16,20 @@ public class VoicePlayerServer extends Thread {
 	private static final String TAG = "VPS";
 	static public DatagramSocket socket;
 
+	private AudioTrack speaker;
 	private int sampleRate = 8000;
 	private int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 	
+	private boolean close;
 	VoicePlayerServer(String server, int port) throws UnknownHostException, SocketException {
 		super();
+		close = false;
 		socket = new DatagramSocket();
 	}
 	
 	public void run() {
 		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-		AudioTrack speaker = null;
 		byte[][] buffers = new byte[256][160];
 		int ix = 0;
 		
@@ -39,7 +41,7 @@ public class VoicePlayerServer extends Thread {
 
 		speaker.play();
 		
-		while(!isInterrupted()) {
+		while(!close) {
 			try {
 				byte[] buffer = buffers[ix++ % buffers.length];
 
@@ -75,5 +77,11 @@ public class VoicePlayerServer extends Thread {
 				Log.e(TAG, "Error: "+ e);
 			}
 		}
+	}
+	public void close() {
+		if(speaker != null) {
+			speaker.release();
+		}
+		close=true;
 	}
 }
