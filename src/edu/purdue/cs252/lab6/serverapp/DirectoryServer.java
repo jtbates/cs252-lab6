@@ -242,6 +242,7 @@ public class DirectoryServer {
 				throw new IllegalStateException("User " + username + " sends C_CALL_READY but no corresponding call in callMap");
 			}
 			else {
+				System.out.println("C_CALL_READY from " + username);
 				for(Call.Caller c : call.getCallerList()) {
 					String username2 = c.username;
 					if(!username2.equals(username)) {
