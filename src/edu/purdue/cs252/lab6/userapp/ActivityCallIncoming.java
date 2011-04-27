@@ -23,24 +23,28 @@ public class ActivityCallIncoming extends Activity {
 	static final private String TAG = "ACIncoming";
 	MediaPlayer mMediaPlayer;
     /** Called when the activity is first created. */
+	Handler callIncomingHandler;
+	DirectoryClient dc;
 	
-	
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	dc.setReadHandler(callIncomingHandler);
+    }
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_incoming);
         
         final String username2 = Call.getUsername2();
-        
         final TextView textWhosCalling = (TextView)findViewById(R.id.TextWhosCalling);
         textWhosCalling.setText(username2 + " is calling");
         
         final VoipApp appState = (VoipApp) getApplicationContext(); 
         // get the directory client 
-       	final DirectoryClient dc = appState.getDirectoryClient();
-       	
+       	dc = appState.getDirectoryClient();
        	final Activity thisActivity = ActivityCallIncoming.this;
-       	
        	final String server = dc.getServer();
        	
        	Uri alert = RingtoneManager.getActualDefaultRingtoneUri(getBaseContext(),RingtoneManager.TYPE_RINGTONE);
@@ -71,7 +75,7 @@ public class ActivityCallIncoming extends Activity {
         	e1.printStackTrace();
         }
         
-       	Handler callIncomingHandler = new Handler() {
+        callIncomingHandler = new Handler() {
        		public void handleMessage(Message msg) {
        			Log.i(TAG,"callIncomingHandler");
    	       		if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {

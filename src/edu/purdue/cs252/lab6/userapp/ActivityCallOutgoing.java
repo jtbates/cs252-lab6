@@ -15,9 +15,16 @@ import android.widget.TextView;
 public class ActivityCallOutgoing extends Activity {
 	private static final String TAG = "ACOutgoing";
     /** Called when the activity is first created. */
+	DirectoryClient dc;
+	Handler callOutgoingHandler;
+    
+	@Override
+	protected void onResume() {
+		super.onResume();
+		dc.setReadHandler(callOutgoingHandler);
+	}
 	
-	
-    @Override
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_outgoing);
@@ -25,11 +32,11 @@ public class ActivityCallOutgoing extends Activity {
         final VoipApp appState = (VoipApp) getApplicationContext();
        	final Activity thisActivity = ActivityCallOutgoing.this;
         // get the directory client 
-       	final DirectoryClient dc = appState.getDirectoryClient();
+       	dc = appState.getDirectoryClient();
        	final String server = dc.getServer();
        	String username2 = Call.getUsername2();
        	
-       	Handler callOutgoingHandler = new Handler() {
+       	callOutgoingHandler = new Handler() {
        		public void handleMessage(Message msg) {
        			Log.i(TAG,"callOutgoingHandler");
    	       		if(msg.what == DirectoryCommand.S_CALL_ACCEPTED.getCode()) {

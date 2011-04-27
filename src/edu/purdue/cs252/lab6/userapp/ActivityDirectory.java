@@ -42,7 +42,6 @@ public class ActivityDirectory extends ListActivity {
 	User user;
 	ArrayAdapter<String> adapter;
 	
-	
 	public void createHandler() {
 		handler = new Handler() {
 	   		public void handleMessage(Message msg) {
