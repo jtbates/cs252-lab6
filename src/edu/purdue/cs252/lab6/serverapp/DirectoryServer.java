@@ -382,6 +382,7 @@ public class DirectoryServer {
 		
 		Call(String username1, String username2) throws IOException {
 			this.callerList = new CopyOnWriteArrayList<Caller>();
+			this.socketList = new CopyOnWriteArrayList<DatagramSocket>();
 			callMap.put(username1, this);
 			callMap.put(username2, this);
 			connect(username1);
@@ -408,7 +409,7 @@ public class DirectoryServer {
 		
 		synchronized void connect(String username) throws IOException {
 			try {
-				new Caller(username);
+				callerList.add(new Caller(username));
 			}
 			catch(SocketException e) {
 				System.out.println("Error making Caller for " + username + ": " + e);
@@ -512,7 +513,6 @@ public class DirectoryServer {
 					}
 				};
 				redirectThread.start();
-				callerList.add(thisCaller);
 				
 			}
 			
