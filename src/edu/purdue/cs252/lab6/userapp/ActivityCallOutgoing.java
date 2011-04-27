@@ -36,7 +36,8 @@ public class ActivityCallOutgoing extends Activity {
    	       		else if (msg.what == DirectoryCommand.S_CALL_REJECT.getCode()) {
    	       			Log.i(TAG, "call rejected");
    	       			Call.setState(Call.State.IDLE);
-   	       			finish();
+   	       			Intent directoryIntent = new Intent(thisActivity.getBaseContext(), ActivityDirectory.class);
+   	       			startActivity(directoryIntent);
    	       		}
    	       		else if(msg.what == DirectoryCommand.S_REDIRECT_INIT.getCode()) {
    	       			try {

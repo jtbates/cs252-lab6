@@ -115,7 +115,9 @@ public class ActivityCallIncoming extends Activity {
         	public void onClick(View v) {
         		mMediaPlayer.stop();
         		dc.call_reject(username2);
-        		finish();
+	       		Call.setState(Call.State.IDLE);
+	       		Intent directoryIntent = new Intent(v.getContext(), ActivityDirectory.class);
+	       		startActivity(directoryIntent);
         	}
         });
        
@@ -128,7 +130,7 @@ public class ActivityCallIncoming extends Activity {
             	mMediaPlayer.stop();
             	dc.call_answer(username2);
             	// Start the voice player server
-            	//new Thread(new VoicePlayerServer()).start();
+            	//new Thread(new VoicePlayerServer()).start();l
             	// TODO: Start voice capture client after confirming caller's voice player server has started
             	// Start the voice capture client
         		//new Thread(new VoiceCaptureClient()).start();
