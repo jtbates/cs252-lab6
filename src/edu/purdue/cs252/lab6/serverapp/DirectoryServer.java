@@ -418,8 +418,7 @@ public class DirectoryServer {
 		
 		synchronized void connect(String username) throws IOException {
 			try {
-				Caller caller = new Caller(username);
-				callerList.add(caller);
+				new Caller(username);
 			}
 			catch(SocketException e) {
 				System.out.println("Error making Caller for " + username + ": " + e);
@@ -488,6 +487,7 @@ public class DirectoryServer {
 						try {
 							redirectSocket.receive(packet);
 							nSocketAddress = packet.getSocketAddress();
+							callerList.add(thisCaller);
 							
 							System.out.println(username + "'s first UDP packet");
 							
