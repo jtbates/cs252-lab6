@@ -214,6 +214,7 @@ public class DirectoryServer {
 				}
 			}
 			else {
+				call = new Call(username,username2);
 				client2.call_accepted(username);
 			}
 		}
@@ -295,7 +296,8 @@ public class DirectoryServer {
 
 		public void call_accepted(String username2) throws IOException {
 			System.out.println(username + "'s call is accepted by " + username2);
-			/*call = callMap.get(username2);
+			
+			call = callMap.get(username);
 			if(call == null) {
 				synchronized(oos) {
 					oos.writeObject(DirectoryCommand.S_ERROR_CALLFAILED);
@@ -303,15 +305,11 @@ public class DirectoryServer {
 				}
 			}
 			else {
-				callMap.put(username, call);*/
 				synchronized(oos) {
 					oos.writeObject(DirectoryCommand.S_CALL_ACCEPTED);
 					oos.flush();
 				}
-			//}
-				call = new Call(username,username2);
-				callMap.put(username, call);
-				callMap.put(username2, call);
+			}
 		}
 		
 		public void call_disconnect(String username2) throws IOException {
@@ -382,7 +380,8 @@ public class DirectoryServer {
 		
 		Call(String username1, String username2) throws IOException {
 			this.callerList = new CopyOnWriteArrayList<Caller>();
-			
+			callMap.put(username1, this);
+			callMap.put(username2, this);
 			connect(username1);
 			connect(username2);
 		}
