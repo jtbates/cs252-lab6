@@ -229,7 +229,8 @@ public class ActivityDirectory extends ListActivity {
 	@Override
     public void onResume() {
     	super.onResume();
-    	createHandler();
+		dc.setReadHandler(handler);
+    	
     	/*
     	// Capture ACTION_INCOMINGCALL broadcast
     	IntentFilter intentFilter = new IntentFilter(RingerServer.ACTION_INCOMINGCALL);
