@@ -475,7 +475,7 @@ public class DirectoryServer {
 				this.username = uname;
 				
 				this.redirectSocket = new DatagramSocket();
-				System.out.println("constructor port: " + redirectSocket.getPort());
+				System.out.println("constructor port: " + redirectSocket.getLocalPort());
 
 				redirectThread = new Thread() {
 					@Override
