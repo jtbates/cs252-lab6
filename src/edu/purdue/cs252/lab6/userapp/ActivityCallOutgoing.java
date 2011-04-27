@@ -44,33 +44,33 @@ public class ActivityCallOutgoing extends Activity {
        	AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
        	if(ringback == null)
        	{
-       		ringback = new ToneGenerator(AudioManager.STREAM_VOICE_CALL,ToneGenerator.MAX_VOLUME);
-       		ringback.startTone(ToneGenerator.TONE_SUP_RINGTONE);
+       		//ringback = new ToneGenerator(AudioManager.STREAM_VOICE_CALL,ToneGenerator.MAX_VOLUME);
+       		//ringback.startTone(ToneGenerator.TONE_SUP_RINGTONE);
        	}
        	
        	callOutgoingHandler = new Handler() {
        		public void handleMessage(Message msg) {
        			Log.i(TAG,"callOutgoingHandler");
    	       		if(msg.what == DirectoryCommand.S_CALL_ACCEPTED.getCode()) {
-   	       			ringback.stopTone();
-   	       			ringback.release();
-   	       			ringback = null;
+   	       			//ringback.stopTone();
+   	       			//ringback.release();
+   	       			//ringback = null;
    	       			Log.i(TAG,"call accepted");
    	       		}
    	       		else if (msg.what == DirectoryCommand.S_CALL_REJECT.getCode()) {
    	       			Log.i(TAG, "call rejected");
-   	       			ringback.stopTone();
-   	       			ringback.release();
-   	       			ringback = null;
+   	       			///ringback.stopTone();
+   	       			//ringback.release();
+   	       			//ringback = null;
    	       			Call.setState(Call.State.IDLE);
    	       			finish();
    	       		}
    	       		else if(msg.what == DirectoryCommand.S_REDIRECT_INIT.getCode()) {
    	       			try {
 	   	       			int port = msg.arg1;
-	   	       			ringback.stopTone();
-	   	       			ringback.release();
-	   	       			ringback = null;
+	   	       			//ringback.stopTone();
+	   	       			//ringback.release();
+	   	       			//ringback = null;
 	   	       			Call.setPort(port);
 	   	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
 	   	       			appState.setVoicePlayerServer(voicePlayerServer);
@@ -84,9 +84,9 @@ public class ActivityCallOutgoing extends Activity {
    	       			}
    	       		} else if(msg.what == DirectoryCommand.S_REDIRECT_READY.getCode()) {
        				Log.i(TAG,"S_REDIRECT_READY");
-       				ringback.stopTone();
-       				ringback.release();
-       				ringback = null;
+       				//ringback.stopTone();
+       				//ringback.release();
+       				//ringback = null;
    	       			VoiceCaptureClient voiceCaptureClient = new VoiceCaptureClient(server,Call.getPort());
    	       			appState.setVoiceCaptureClient(voiceCaptureClient);
    	       			voiceCaptureClient.start();

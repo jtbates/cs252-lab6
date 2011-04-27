@@ -120,7 +120,7 @@ public class ActivityHome extends Activity {
         		finish();
         		return true;
         	case R.id.help:
-        		//set up dialog
+        		//set up dialogs
             	final Dialog dialog = new Dialog(ActivityHome.this);
             	dialog.setContentView(R.layout.helpdialog);
             	dialog.setTitle("CS252 Voip");
