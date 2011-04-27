@@ -55,23 +55,6 @@ public class VoicePlayerServer extends Thread {
 				buffer=packet.getData();
 				speaker.write(buffer,0,buffer.length);
 				Log.i(TAG,"speaker write");
-				/*
-				Log.i("UDP", "VPS: Connecting...");
-				// Create new UDP-Socket 
-				//DatagramSocket socket = new DatagramSocket(SERVERPORT, serverAddr);
-				
-				// By magic we know, how much data will be waiting for us 
-				byte[] buf = new byte[17];
-				// Prepare a UDP-Packet that can
-				// contain the data we want to receive 
-				DatagramPacket packet = new DatagramPacket(buf, buf.length);
-				Log.i("UDP", "VPS: Receiving...");
-	
-				// Receive the UDP-Packet 
-				socket.receive(packet);
-				Log.i("UDP", "VPS: Received: '" + new String(packet.getData()) + "'");
-				Log.i("UDP", "VPS: Done.");
-				*/
 				
 			} catch (IOException e) {
 				Log.e(TAG, "Error: "+ e);

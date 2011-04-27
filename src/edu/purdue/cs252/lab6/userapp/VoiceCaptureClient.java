@@ -67,27 +67,6 @@ public class VoiceCaptureClient extends Thread {
 					//Send the packet
 					socket.send(packet);
 					
-					/*
-					// Retrieve the ServerName
-					InetAddress serverAddr = InetAddress.getByName(server);
-		
-					Log.i("UDP", "VCC: Connecting to " + server + " on " + rPort + "...");
-					// Create new UDP-Socket 
-					//DatagramSocket socket = new DatagramSocket(lPort);
-					
-					// Prepare some data to be sent. 
-					byte[] buf = ("Hello from VoiceCaptureClient").getBytes();
-		
-					// Create UDP-packet with
-					// data & destination(url+port) 
-					DatagramPacket packet = new DatagramPacket(buf, buf.length, serverAddr, rPort);
-					Log.i("UDP", "C: Sending: '" + new String(buf) + "'");
-		
-					// Send out the packet 
-					socket.send(packet);
-					Log.i("UDP", "C: Sent.");
-					Log.i("UDP", "C: Done.");
-					*/
 				} catch (Exception e) {
 					Log.e(TAG, "C: Error", e);
 				}
