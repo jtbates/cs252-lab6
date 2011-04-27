@@ -11,6 +11,7 @@ public enum DirectoryCommand implements Serializable {
 	C_CALL_ANSWER(0x14), // argument is the username of the caller (String)
 	C_CALL_HANGUP(0x15), // disconnects from the call; no argument
 	C_CALL_READY(0x16), // client is connected to redirect port and awaiting communication; no argument 
+	C_CALL_REJECT(0x17), // client is rejecting the call from the person that is calling, argument is the username of the caller
 	
 	// commands the server sends to a client 
 	S_CALL_INCOMING(0x20), // another user is make an incoming call; argument is the caller's username (String)
@@ -19,7 +20,8 @@ public enum DirectoryCommand implements Serializable {
 	S_REDIRECT_READY(0x23), // tells the client that the other user is ready to receive communications; argument is username (String) of other user
 	S_DIRECTORY_SEND(0x24), // sends a list of all logged in users; argument is map of users
 	S_CALL_DISCONNECT(0x25), // informs the client that the call has been ended; argument is the username of the user that disconnected
-
+	S_CALL_REJECT(0x26), // informs the client that the call has been rejected
+	
 	// status messages the server sends to a client
 	S_ERROR_USERALREADYEXISTS(0x30), // login failed because the username is already taken; no argument
 	S_ERROR_USERDOESNOTEXIST(0x31), // call failed because the user is not logged in; no argument

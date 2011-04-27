@@ -147,6 +147,9 @@ public class DirectoryServer {
 								case C_DIRECTORY_GET:
 									directory_send();
 									break;
+								case C_CALL_REJECT:
+									call_reject((String) ois.readObject());
+									break;
 								case C_CALL_ATTEMPT:
 									call_attempt((String) ois.readObject());
 									break;
@@ -185,6 +188,25 @@ public class DirectoryServer {
 				}
 			};
 			thread.start();
+		}
+		
+		
+		private void call_reject(String username2) throws IOException {
+			System.out.println(username + " is attempting to reject the call from " + username2);
+			Client client2 = clientMap.get(username2);
+			
+			if (client2 == null) {
+				synchronized(oos) {
+					oos.writeObject(DirectoryCommand.S_ERROR_USERDOESNOTEXIST);
+					oos.flush();
+				}
+			}
+			else {
+				Client clientThread2 = clientMap.get(username2);
+				clientThread2.call_rejecting(username);
+			}
+			
+			
 		}
 		
 		private void call_attempt(String username2) throws IOException {
@@ -292,9 +314,9 @@ public class DirectoryServer {
 				// TODO handle error closing stream
 			}
 		}
+		
 		// methods below do not correspond to commands from the client
 		// they are called by another Client object or Call object
-
 		public void call_incoming(String username2) throws IOException {
 			synchronized(oos) {
 				oos.writeObject(DirectoryCommand.S_CALL_INCOMING);
@@ -303,6 +325,14 @@ public class DirectoryServer {
 			}
 		}
 
+		
+		public void call_rejecting(String username2) throws IOException {
+			synchronized(oos) {
+				oos.writeObject(DirectoryCommand.S_CALL_REJECT);
+				oos.flush();
+			}
+		}
+		
 		public void call_accepted(String username2) throws IOException {
 			System.out.println(username + "'s call is accepted by " + username2);
 			call = callMap.get(username2);

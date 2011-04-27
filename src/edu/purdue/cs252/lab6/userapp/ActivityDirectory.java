@@ -185,7 +185,7 @@ public class ActivityDirectory extends ListActivity {
 		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 		    	   //Clicking Yes on the dialog box
 		    	   public void onClick(DialogInterface dialog, int id) {
-		    		   //TODO : implement the connect to the next user
+		    		   //TODO : implement the connect to the next userf
 		    		   //Write to log to check if it is working
 		    		   Log.d("Connect", "to the next user");
 		    		   Call.setUsername2(username2);

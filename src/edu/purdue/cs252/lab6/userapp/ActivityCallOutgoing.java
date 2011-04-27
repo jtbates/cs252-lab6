@@ -33,6 +33,11 @@ public class ActivityCallOutgoing extends Activity {
    	       		if(msg.what == DirectoryCommand.S_CALL_ACCEPTED.getCode()) {
    	       			Log.i(TAG,"call accepted");
    	       		}
+   	       		else if (msg.what == DirectoryCommand.S_CALL_REJECT.getCode()) {
+   	       			Log.i(TAG, "call rejected");
+   	       			Call.setState(Call.State.IDLE);
+   	       			finish();
+   	       		}
    	       		else if(msg.what == DirectoryCommand.S_REDIRECT_INIT.getCode()) {
    	       			try {
 	   	       			int port = msg.arg1;
@@ -80,7 +85,7 @@ public class ActivityCallOutgoing extends Activity {
         	//ringing.join();        	
         	// Connection successful
         	
-        	// Switch to call ongoing activity
+        	// Switch to call ongoing activi
             //Intent callOngoingIntent = new Intent(this, ActivityCallOngoing.class);
             //startActivity(callOngoingIntent);
         }

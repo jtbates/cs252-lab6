@@ -105,6 +105,23 @@ public class ActivityCallIncoming extends Activity {
        	};
         dc.setReadHandler(callIncomingHandler);
         
+        
+        //ActionListener for the Reject Call Button
+        //Once the button is clicked stop the ring tone
+        //Let the server know the call is being rejected
+        //End the current activity
+        final Button buttonRejectCall = (Button) findViewById(R.id.ButtonRejectCall);
+        buttonRejectCall.setOnClickListener(new OnClickListener() {
+        	public void onClick(View v) {
+        		mMediaPlayer.stop();
+        		dc.call_reject(username2);
+        		
+        	}
+        });
+       
+        
+        
+        
         final Button buttonCallAnswer = (Button) findViewById(R.id.ButtonCallAnswer);
         buttonCallAnswer.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {

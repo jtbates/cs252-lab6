@@ -158,6 +158,11 @@ public class DirectoryClient {
 							msg.arg1 = port;
 							readHandler.sendMessage(msg);
 							break;
+						case S_CALL_REJECT:
+							Log.i(TAG, "S_CALL_REJECT");
+							msg.what = DirectoryCommand.S_CALL_REJECT.getCode();
+							readHandler.sendMessage(msg);
+							break;
 						case S_REDIRECT_READY:
 							Log.i(TAG,"S_REDIRECT_READY");
 							username = (String)ois.readObject();
@@ -232,6 +237,31 @@ public class DirectoryClient {
 				}
 			}
 		});		
+	}
+	
+	
+	/*
+	 *  Summary: Sends the C_CALL_REJECT command and username to the directory server
+	 *  Parameters: final String username2
+	 *  Return: void 
+	 */
+	public void call_reject(final String username2) {
+		Log.i(TAG,"rejecting call from " + username2);
+		writeHandler.post(new Runnable() {
+			public void run() {
+				try {
+					synchronized(socket) {
+						oos.writeObject(DirectoryCommand.C_CALL_REJECT);
+						oos.writeObject(username2);
+						oos.flush();
+					}
+				}
+				catch(IOException e) {
+					Log.e(TAG, "Write error, call rejecting failed");
+				}
+			}
+		});
+		
 	}
 	
 	public void call_answer(final String username2) {

@@ -99,4 +99,6 @@ public class VoiceCaptureClient extends Thread {
 			this.interrupt();
 		}
 	}
+	
+	
 }
