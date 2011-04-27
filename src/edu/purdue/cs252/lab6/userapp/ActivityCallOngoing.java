@@ -1,6 +1,5 @@
 package edu.purdue.cs252.lab6.userapp;
 
-import edu.purdue.cs252.lab6.DirectoryCommand;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,9 +7,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
+import edu.purdue.cs252.lab6.DirectoryCommand;
 
 public class ActivityCallOngoing extends Activity {
 	private static final String TAG = "ACOngoing";
@@ -65,6 +66,9 @@ public class ActivityCallOngoing extends Activity {
        		}
        	};
         dc.setReadHandler(callOngoingHandler);
+        
+        // Have the WindowManager filter out touch events that are "too fat".
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_IGNORE_CHEEK_PRESSES);
 
         
         final Button buttonCallEnd = (Button) findViewById(R.id.ButtonCallEnd);
