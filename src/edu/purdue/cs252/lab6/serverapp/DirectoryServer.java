@@ -417,13 +417,12 @@ public class DirectoryServer {
 		}*/
 		
 		synchronized void connect(String username) throws IOException {
-			Caller caller = new Caller(username);
-			if(caller.redirectSocket != null && !caller.redirectSocket.isClosed()) {
+			try {
+				Caller caller = new Caller(username);
 				callerList.add(caller);
-				System.out.println(username + " connected to call");
 			}
-			else {
-				System.out.println("Failed to connect call for " + username);
+			catch(SocketException e) {
+				System.out.println("Error making Caller for " + username + ": " + e);
 			}
 		}
 		
@@ -472,17 +471,12 @@ public class DirectoryServer {
 			public Thread redirectThread;
 			
 			
-			Caller(String uname) {
+			Caller(String uname) throws SocketException {
 				final Caller thisCaller = this;
 				this.username = uname;
-				try {
-					this.redirectSocket = new DatagramSocket();
-					System.out.println("constructor port: " + redirectSocket.getPort());
-				}
-				catch(SocketException e) {
-					System.out.println("Error making Caller for " + uname + ": " + e);
-					return;
-				}
+				
+				this.redirectSocket = new DatagramSocket();
+				System.out.println("constructor port: " + redirectSocket.getPort());
 
 				redirectThread = new Thread() {
 					@Override
@@ -494,8 +488,6 @@ public class DirectoryServer {
 						try {
 							redirectSocket.receive(packet);
 							nSocketAddress = packet.getSocketAddress();
-							
-							callerList.add(thisCaller);
 							
 							System.out.println(username + "'s first UDP packet");
 							
