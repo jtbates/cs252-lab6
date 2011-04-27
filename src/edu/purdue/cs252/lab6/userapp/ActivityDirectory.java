@@ -145,7 +145,8 @@ public class ActivityDirectory extends ListActivity {
              }
              Intent intent = new Intent();
              setResult(RESULT_OK, intent);
-             finish();
+             Intent menuIntent = new Intent(thisActivity.getBaseContext(), ActivityHome.class);
+       		 startActivity(menuIntent);
             }
         });
 		
