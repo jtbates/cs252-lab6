@@ -214,9 +214,6 @@ public class DirectoryServer {
 				}
 			}
 			else {
-				call = new Call(username,username2);
-				callMap.put(username, call);
-				call_redirectReady();
 				client2.call_accepted(username);
 			}
 		}
@@ -298,7 +295,7 @@ public class DirectoryServer {
 
 		public void call_accepted(String username2) throws IOException {
 			System.out.println(username + "'s call is accepted by " + username2);
-			call = callMap.get(username2);
+			/*call = callMap.get(username2);
 			if(call == null) {
 				synchronized(oos) {
 					oos.writeObject(DirectoryCommand.S_ERROR_CALLFAILED);
@@ -306,13 +303,15 @@ public class DirectoryServer {
 				}
 			}
 			else {
-				callMap.put(username, call);
+				callMap.put(username, call);*/
 				synchronized(oos) {
 					oos.writeObject(DirectoryCommand.S_CALL_ACCEPTED);
 					oos.flush();
 				}
-				call_redirectReady();
-			}
+			//}
+				call = new Call(username,username2);
+				callMap.put(username, call);
+				callMap.put(username2, call);
 		}
 		
 		public void call_disconnect(String username2) throws IOException {
@@ -323,10 +322,9 @@ public class DirectoryServer {
 			}
 		}
 		
-		public void call_redirectReady() throws IOException {
+		public void call_redirectReady(int port) throws IOException {
 			synchronized(oos) {
 				oos.writeObject(DirectoryCommand.S_REDIRECT_INIT);
-				int port = call.getRedirectPort(username);
 				oos.writeInt(port);
 				oos.flush();
 				System.out.println("S_REDIRECT_INIT " + port + " to " + username);
@@ -459,18 +457,15 @@ public class DirectoryServer {
 			public DatagramSocket redirectSocket; // redirect Socket
 			public SocketAddress nSocketAddress; // NAT address
 			public Thread redirectThread;
-			public boolean ready;
-			public boolean close;
-			
-			Caller(String uname) throws SocketException {
+		
+			Caller(String uname) throws SocketException, IOException {
 				final Caller thisCaller = this;
 				this.username = uname;
-				this.ready = false;
-				this.close = false;
 				
 				this.redirectSocket = new DatagramSocket();
 				System.out.println("constructor port: " + redirectSocket.getLocalPort());
-
+				clientMap.get(uname).call_redirectReady(redirectSocket.getLocalPort());
+				
 				redirectThread = new Thread() {
 					@Override
 					public void run() {
@@ -482,11 +477,8 @@ public class DirectoryServer {
 							redirectSocket.receive(packet);
 							
 							nSocketAddress = packet.getSocketAddress();
-							callerList.add(thisCaller);
-
-							ready = true;
-							
 							System.out.println(username + "'s first UDP packet");
+							callerList.add(thisCaller);
 							
 							while (!isInterrupted()) {
 								redirectSocket.receive(packet);
@@ -502,16 +494,12 @@ public class DirectoryServer {
 							if(callerList.contains(thisCaller)) {
 								System.out.println("UDP Redirect Error for " + username + ": " + e);
 								e.printStackTrace();
-								close = true;
 								disconnect(username);
 							}
 						}
 					}
 				};
 				redirectThread.start();
-				while(!ready && !close) {
-					Thread.yield();
-				}
 			}
 			
 		}
