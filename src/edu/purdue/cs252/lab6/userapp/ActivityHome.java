@@ -1,6 +1,7 @@
 package edu.purdue.cs252.lab6.userapp;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +17,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import edu.purdue.cs252.lab6.DirectoryCommand;
 import edu.purdue.cs252.lab6.User;
@@ -73,9 +76,6 @@ public class ActivityHome extends Activity {
     		Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG);
     		toast.show();
     	}
-
-    	
-       
     }
 	
     @Override
@@ -112,17 +112,40 @@ public class ActivityHome extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-        case R.id.settings:
-        	Intent help = new Intent(ActivityHome.this, ActivitySettings.class);
-			startActivity(help);
-            return true;
-        case R.id.quit:
-        	finish();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
+        	case R.id.settings:
+        		Intent help = new Intent(ActivityHome.this, ActivitySettings.class);
+        		startActivity(help);
+        		return true;
+        	case R.id.quit:
+        		finish();
+        		return true;
+        	case R.id.help:
+        		//set up dialog
+            	final Dialog dialog = new Dialog(ActivityHome.this);
+            	dialog.setContentView(R.layout.helpdialog);
+            	dialog.setTitle("CS252 Voip");
+            	dialog.setCancelable(true);
+            	//there are a lot of settings, for dialog, check them all out!
+            	//set up text
+            	TextView text = (TextView) dialog.findViewById(R.id.TextView01);
+            	text.setText(R.string.help_dialog);
+            	//set up image view
+            	ImageView img = (ImageView) dialog.findViewById(R.id.ImageView01);
+            	img.setImageResource(R.drawable.cs252);
+            	//set up button
+            	Button button = (Button) dialog.findViewById(R.id.Button01);
+            	button.setOnClickListener(new OnClickListener() {
+                	public void onClick(View v) {
+                		dialog.cancel();
+                	}
+                });
+            	//now that the dialog is set up, it's time to show it
+            	dialog.show();
+        		return true;
+        	default:
+        		return super.onOptionsItemSelected(item);
         }
     }
-    
+       
     
 }
