@@ -26,6 +26,7 @@ public class ActivityCallOutgoing extends Activity {
 		dc.setReadHandler(callOutgoingHandler);
 	}
 	
+	//Function for creating the activity
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +49,9 @@ public class ActivityCallOutgoing extends Activity {
        		//ringback.startTone(ToneGenerator.TONE_SUP_RINGTONE);
        	}
        	
+       	//Define the callOutGoinghandler
+       	//C_CALL_ACCEPTED for when the user accepts the call
+       	//C_CALL_REJECTED for when the user rejects the call
        	callOutgoingHandler = new Handler() {
        		public void handleMessage(Message msg) {
        			Log.i(TAG,"callOutgoingHandler");
@@ -62,6 +66,7 @@ public class ActivityCallOutgoing extends Activity {
    	       			///ringback.stopTone();
    	       			//ringback.release();
    	       			//ringback = null;
+   	       			//Set the state back to idle and finish the activity
    	       			Call.setState(Call.State.IDLE);
    	       			finish();
    	       		}
@@ -71,6 +76,7 @@ public class ActivityCallOutgoing extends Activity {
 	   	       			//ringback.stopTone();
 	   	       			//ringback.release();
 	   	       			//ringback = null;
+	   	       			///Redirect the ports for the call
 	   	       			Call.setPort(port);
 	   	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
 	   	       			appState.setVoicePlayerServer(voicePlayerServer);
@@ -102,9 +108,11 @@ public class ActivityCallOutgoing extends Activity {
    	       		}
        		}
        	};
+       	//Set the handler the outgoing call handler
         dc.setReadHandler(callOutgoingHandler);
        	dc.call_attempt(username2);
         
+       	//Set the text on the top of the screen to who is calling
         final TextView textCallingWhom = (TextView)findViewById(R.id.TextCallingWhom);
         textCallingWhom.setText("Calling " + username2 + "...");
 
