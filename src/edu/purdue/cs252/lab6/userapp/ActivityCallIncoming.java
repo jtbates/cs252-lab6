@@ -1,5 +1,7 @@
 package edu.purdue.cs252.lab6.userapp;
 
+// Class for Incoming Calls
+
 import java.io.IOException;
 
 import android.app.Activity;
@@ -22,9 +24,11 @@ import edu.purdue.cs252.lab6.DirectoryCommand;
 public class ActivityCallIncoming extends Activity {
 	static final private String TAG = "ACIncoming";
 	MediaPlayer mMediaPlayer;
-    /** Called when the activity is first created. */
+    
 	Handler callIncomingHandler;
 	DirectoryClient dc;
+	
+	/** Called when the activity is resumed. */
 	
     @Override
     protected void onResume() {
@@ -32,9 +36,12 @@ public class ActivityCallIncoming extends Activity {
     	dc.setReadHandler(callIncomingHandler);
     }
     
+    /** Called when the activity is first created. */
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Set layout
         setContentView(R.layout.call_incoming);
         
         final String username2 = Call.getUsername2();
@@ -45,7 +52,10 @@ public class ActivityCallIncoming extends Activity {
         // get the directory client 
        	dc = appState.getDirectoryClient();
        	final Activity thisActivity = ActivityCallIncoming.this;
+       	// get the server
        	final String server = dc.getServer();
+       	
+       	//Initialize ringtone
        	
        	Uri alert = RingtoneManager.getActualDefaultRingtoneUri(getBaseContext(),RingtoneManager.TYPE_RINGTONE);
         mMediaPlayer = new MediaPlayer();
@@ -87,6 +97,7 @@ public class ActivityCallIncoming extends Activity {
 	   	       			Call.setPort(port);
 	   	       			VoicePlayerServer voicePlayerServer = new VoicePlayerServer(server,port);
 	   	       			appState.setVoicePlayerServer(voicePlayerServer);
+	   	       			// start VoicePlayerServer
 	   	       			voicePlayerServer.start();
 	   	       			Intent callOngoingIntent = new Intent(thisActivity.getBaseContext(), ActivityCallOngoing.class);
 	   	       			startActivityForResult(callOngoingIntent, 0);
@@ -113,7 +124,7 @@ public class ActivityCallIncoming extends Activity {
         
         
         //ActionListener for the Reject Call Button
-        //Once the button is clicked stop the ring tone
+        //Once the button is clicked stop the ringtone
         //Let the server know the call is being rejected
         //End the current activity
         final Button buttonRejectCall = (Button) findViewById(R.id.ButtonRejectCall);
@@ -126,21 +137,17 @@ public class ActivityCallIncoming extends Activity {
         	}
         });
        
-        
-        
+        //ActionListener for the Answer Call Button
+        //Once the button is clicked stop the ringtone
+        //Answer call
         
         final Button buttonCallAnswer = (Button) findViewById(R.id.ButtonCallAnswer);
         buttonCallAnswer.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+            	// Stop Ringtone
             	mMediaPlayer.stop();
+            	// Answer Call
             	dc.call_answer(username2);
-            	// Start the voice player server
-            	//new Thread(new VoicePlayerServer()).start();l
-            	// TODO: Start voice capture client after confirming caller's voice player server has started
-            	// Start the voice capture client
-        		//new Thread(new VoiceCaptureClient()).start();
-            	
-            	// Switch to ongoing call activity
             }
         });
     }
