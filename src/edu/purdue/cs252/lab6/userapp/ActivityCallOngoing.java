@@ -54,7 +54,7 @@ public class ActivityCallOngoing extends Activity {
        			}
        			else if(msg.what == DirectoryCommand.S_STATUS_OK.getCode()) {
        				if(msg.obj.equals(DirectoryCommand.C_CALL_HANGUP)) {
-       					Call.setState(Call.State.IDLE);
+       					//Call.setState(Call.State.IDLE);
        					returnToDirectory();
        				}
        			}
@@ -99,5 +99,6 @@ public class ActivityCallOngoing extends Activity {
 		Intent directoryIntent = new Intent(thisActivity.getBaseContext(), ActivityDirectory.class);
 		directoryIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(directoryIntent);
+		//finish();
     }
 }
