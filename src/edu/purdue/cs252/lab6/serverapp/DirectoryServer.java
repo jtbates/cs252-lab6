@@ -308,9 +308,8 @@ public class DirectoryServer {
 				}
 			}
 		
-			printUserList();
-			
 			close();
+			printUserList();
 		}
 
 		//Used when the server is shut down
