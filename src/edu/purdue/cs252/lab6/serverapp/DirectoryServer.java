@@ -49,6 +49,17 @@ public class DirectoryServer {
 		public void write(int b) {}
 	}
 
+	//Function for printing the userList
+	private void printUserList() {
+		System.out.println("User List: ");
+		
+		for(String un : userMap.keySet()) {
+			System.out.println(un);
+		}
+		
+		
+	}
+	
 	public static void main(String[] args) {
 		DirectoryServer dserver = new DirectoryServer();
 		int i = 0;
@@ -297,6 +308,8 @@ public class DirectoryServer {
 				}
 			}
 		
+			printUserList();
+			
 			close();
 		}
 
@@ -559,6 +572,7 @@ public class DirectoryServer {
 		}
 	}
 	
+	
 	private void login(User user, ObjectOutputStream oos, ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		String username = user.getUserName();
 		//if the user name is already taken
@@ -584,6 +598,7 @@ public class DirectoryServer {
 			
 			client.success(DirectoryCommand.C_LOGIN);
 			System.out.println("S: " + username + " logged in");
+			printUserList();
 		}
 	}
 
