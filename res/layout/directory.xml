@@ -25,6 +25,7 @@
     </ListView>
     <TextView android:id="@android:id/empty" android:layout_width="fill_parent"
      android:layout_height="wrap_content" android:text="@string/main_empty_list"
-     android:paddingLeft="5px"
+     android:paddingLeft="5px" android:textSize="24sp"
+     android:paddingTop="15px"
      android:layout_below="@id/top_control_bar" android:layout_above="@id/bottom_control_bar" />
 </RelativeLayout>
