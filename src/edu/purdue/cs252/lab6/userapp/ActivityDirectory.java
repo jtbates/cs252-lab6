@@ -42,6 +42,11 @@ public class ActivityDirectory extends ListActivity {
 	User user;
 	ArrayAdapter<String> adapter;
 	
+	/*
+	 * Function for creating the messages handler that 
+	 * control the server/client messages.
+	 * 
+	 */
 	public void createHandler() {
 		handler = new Handler() {
 	   		public void handleMessage(Message msg) {
@@ -50,12 +55,14 @@ public class ActivityDirectory extends ListActivity {
 		       			userMap.clear();
 					//userMap.putAll((Map<String,User>)msg.obj);
 		       			//ArrayList<User> users = (ArrayList<User>)msg.obj;
-		       			UserList uList = (UserList)msg.obj;
+		       		//Gett he userlist
+		       		UserList uList = (UserList)msg.obj;
 					for(int i=0; i<uList.size(); i++) {
 						User u = uList.get(i);
 						userMap.put(u.getUserName(),u);
 					}
 		       			
+					//Print the user list
 					adapter.clear();
 					for(String username2 : userMap.keySet()) {
 						if(!user.getUserName().equals(username2))
@@ -64,17 +71,20 @@ public class ActivityDirectory extends ListActivity {
 					}
 		       		}
 		       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDIN.getCode()) {
+		       			//Receive the message that the user has logged in
 		       			User user2 = (User)msg.obj;
 		       			String username2 = user2.getUserName();
 		       			userMap.put(username2, user2);
 		       			adapter.add(username2);
 		       		}
 		       		else if(msg.what == DirectoryCommand.S_BC_USERLOGGEDOUT.getCode()) {
+		       			///Updates the userlist when the user has logged out
 		       			String username2 = (String)msg.obj;
 		       			userMap.remove(username2);
 		       			adapter.remove(username2);
 		       		}
 		       		else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
+		       			//Lets the user know that they are being called
 		       			String username2 = (String)msg.obj;
 		       			Call.setUsername2(username2);
 		       			Call.setState(Call.State.INCOMING);
@@ -91,7 +101,7 @@ public class ActivityDirectory extends ListActivity {
 	   	};
 	}
 	
-   	
+   	//Main Method for the directory server listing activity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +127,8 @@ public class ActivityDirectory extends ListActivity {
        	final ListActivity thisActivity = this;
 		thisActivity.setListAdapter(adapter);
 		
+		//SORTS The list from a-Z
+		// or sorts the list from Z-A
 		s.setOnItemSelectedListener(new OnItemSelectedListener(){
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 				String str = parent.getItemAtPosition(pos).toString();
@@ -158,20 +170,7 @@ public class ActivityDirectory extends ListActivity {
             }
         });
 		
-	
-		/*Start ringer server
-		
-		//Intent rsIntent = new Intent(this, RingerServer.class);
-		//startService(rsIntent);
-		
-        final Button buttonCall = (Button) findViewById(R.id.ButtonCall);
-        buttonCall.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-            	// Switch to outgoing call activity
-                Intent callOutgoingIntent = new Intent(v.getContext(), ActivityCallOutgoing.class);
-                startActivityForResult(callOutgoingIntent, 0);
-            }
-        });   */     
+  
     }
 	
 	/*
@@ -216,6 +215,7 @@ public class ActivityDirectory extends ListActivity {
 		alert.show();
 	}
 
+	//Logouts out the user when the users clicks the logout button
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)  {
 	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
@@ -243,15 +243,4 @@ public class ActivityDirectory extends ListActivity {
     }
     
 
-    
-    /*private class IncomingCallReceiver extends BroadcastReceiver {
-
-    	@Override
-    	public void onReceive(Context context, Intent intent) {
-        	// Switch to incoming call activity
-        	Intent callIncomingIntent = new Intent(context,ActivityCallIncoming.class);
-        	((Activity) context).startActivityForResult(callIncomingIntent,0);
-    	}
-
-    }*/
 }
