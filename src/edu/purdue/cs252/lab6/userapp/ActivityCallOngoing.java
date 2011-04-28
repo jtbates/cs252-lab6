@@ -19,43 +19,44 @@ public class ActivityCallOngoing extends Activity {
 	private VoipApp appState;
     /** Called when the activity is first created. */
     @Override
+    // This function is called when the button is pushed
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_ongoing);
-        Call.setState(Call.State.ONGOING);
+        Call.setState(Call.State.ONGOING);     //sets call state
         
-        appState = (VoipApp) getApplicationContext(); 
+        appState = (VoipApp) getApplicationContext();     //creates application context
         thisActivity = ActivityCallOngoing.this;
 
         // get the directory client 
-       	final DirectoryClient dc = appState.getDirectoryClient();
+       	final DirectoryClient dc = appState.getDirectoryClient();       //create directory
        	
        	final String server = dc.getServer();
-       	dc.call_ready();
+       	dc.call_ready();					//the call is now ready
       	
-       	Handler callOngoingHandler = new Handler() {
+       	Handler callOngoingHandler = new Handler() {    //preforms tasks based on what is sent from the server
        		public void handleMessage(Message msg) {
        			Log.i(TAG,"callOngoingHandler");
        			if(msg.what == DirectoryCommand.S_REDIRECT_READY.getCode()) {
        				Log.i(TAG,"S_REDIRECT_READY");
    	       			VoiceCaptureClient voiceCaptureClient = new VoiceCaptureClient(server,Call.getPort());
    	       			appState.setVoiceCaptureClient(voiceCaptureClient);
-   	       			voiceCaptureClient.start();
+   	       			voiceCaptureClient.start();					//starts voice capture client
    	       		} 
        			else if(msg.what == DirectoryCommand.S_CALL_INCOMING.getCode()) {
    	       			// ignore
    	       		} 
-       			else if(msg.what == DirectoryCommand.S_CALL_DISCONNECT.getCode()) {
-       				Call.setState(Call.State.IDLE);
+       			else if(msg.what == DirectoryCommand.S_CALL_DISCONNECT.getCode()) {    //if disconnecting
+       				Call.setState(Call.State.IDLE);				//call state is idle
 		    		CharSequence text = Call.getUsername2() + " disconnected from the call";
 		    		Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG);
 		    		toast.show();
 		    		returnToDirectory();
        			}
        			else if(msg.what == DirectoryCommand.S_STATUS_OK.getCode()) {
-       				if(msg.obj.equals(DirectoryCommand.C_CALL_HANGUP)) {
+       				if(msg.obj.equals(DirectoryCommand.C_CALL_HANGUP)) {      //when hanging up
        					Call.setState(Call.State.IDLE);
-       					returnToDirectory();
+       					returnToDirectory();			//returns to user screen
        				}
        			}
    	       		else {
@@ -84,7 +85,7 @@ public class ActivityCallOngoing extends Activity {
     
     //Returns the screen back to he directory
     void returnToDirectory() {
-    	VoiceCaptureClient vcc = appState.getVoiceCaptureClient();
+    	VoiceCaptureClient vcc = appState.getVoiceCaptureClient();   //gets app state
     	VoicePlayerServer vps = appState.getVoicePlayerServer();
     	if(vcc != null) {
 	    	appState.getVoiceCaptureClient().close();
