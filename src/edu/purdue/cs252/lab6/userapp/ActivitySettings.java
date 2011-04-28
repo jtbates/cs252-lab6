@@ -13,6 +13,7 @@ public class ActivitySettings extends Activity {
 	public static String userName;
 	public static String serverName;
 	
+	//Function when the setting button is invoked
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +28,9 @@ public class ActivitySettings extends Activity {
         et.setText(serverName);
     }
     
-    
+    //When the saved setting is called
+    //Saved the input form the user
+    //And close the activity
     public void myClickHandler(View view) {
     	EditText et = (EditText)findViewById(R.id.EditTextUser);
     	userName = et.getText().toString();

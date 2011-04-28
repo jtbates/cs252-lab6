@@ -85,7 +85,7 @@ public class DirectoryServer {
 			e.printStackTrace();
 		}
 	}
-	
+	//Innerclass for accepting threads
 	class acceptThread implements Runnable
 	{
 		private Socket client;
@@ -95,6 +95,7 @@ public class DirectoryServer {
 			this.client = client;
 		}
 		
+		//Since the is the code run, it will wait for a login messsage
 		public void run()
 		{
 			try
@@ -193,6 +194,7 @@ public class DirectoryServer {
 		}
 		
 		
+		//Method used for rejecting the call from the user
 		private void call_reject(String username2) throws IOException {
 			System.out.println(username + " is attempting to reject the call from " + username2);
 			Client client2 = clientMap.get(username2);
@@ -211,6 +213,7 @@ public class DirectoryServer {
 			
 		}
 		
+		//Method used when the user1 is starting to call username2
 		private void call_attempt(String username2) throws IOException {
 			System.out.println(username + " is attempting to call " + username2);
 			Client client2 = clientMap.get(username2);
@@ -226,6 +229,7 @@ public class DirectoryServer {
 			}
 		}
 		
+		//Method for letting the client know the client know his call was accepted
 		private void call_answer(String username2) throws IOException {
 			System.out.println(username + " answers " + username2);
 			Client client2 = clientMap.get(username2);
@@ -241,6 +245,7 @@ public class DirectoryServer {
 			}
 		}
 		
+		//Function used for when the client as for the directory list
 		private void directory_send() throws IOException {
 			synchronized(oos) {
 				oos.writeObject(DirectoryCommand.S_DIRECTORY_SEND);
@@ -250,6 +255,7 @@ public class DirectoryServer {
 			}
 		}
 		
+		//Function used for when the uses presses end call
 		private void call_hangup() throws IOException {
 			if(call == null) {
 				throw new IllegalStateException("User " + username + " attempted to disconnect from a call not found in callMap");
@@ -259,6 +265,7 @@ public class DirectoryServer {
 			}
 		}
 		
+		//Function of letting the client know they are ready to wait for a call
 		private void call_ready() throws IOException {
 			if(call == null) {
 				throw new IllegalStateException("User " + username + " sends C_CALL_READY but no corresponding call in callMap");
@@ -274,6 +281,8 @@ public class DirectoryServer {
 			}
 		}
 		
+		
+		//Logout
 		private void logout() {
 			// Broadcast to all clients that a user has logged out
 			for(String bc_username : userMap.keySet()) {
@@ -291,6 +300,7 @@ public class DirectoryServer {
 			close();
 		}
 
+		//Used when the server is shut down
 		private void close() {
 			userMap.remove(username);
 			clientMap.remove(username);

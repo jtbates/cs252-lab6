@@ -36,10 +36,12 @@ public enum DirectoryCommand implements Serializable {
 
 	private int code;
 	
+	//Constructor for the directory command
 	private DirectoryCommand(int dc) {
 		code = dc;
 	}
 	
+	//Return the code value
 	public int getCode() {
 		return code;
 	}

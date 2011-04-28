@@ -24,6 +24,8 @@ public class VoiceCaptureClient extends Thread {
 	
 	private boolean close;
 	
+	//Constructor
+	//Initailizes all the VoiceCaptureClient variables
 	VoiceCaptureClient(String server, int port) {
 		super();
 		this.close=false;
