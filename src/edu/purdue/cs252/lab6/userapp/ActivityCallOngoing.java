@@ -81,10 +81,16 @@ public class ActivityCallOngoing extends Activity {
     }
     
     void returnToDirectory() {
-    	appState.getVoiceCaptureClient().close();
-    	appState.getVoiceCaptureClient().interrupt();
-    	appState.getVoicePlayerServer().close();
-    	appState.getVoicePlayerServer().interrupt();
+    	VoiceCaptureClient vcc = appState.getVoiceCaptureClient();
+    	VoicePlayerServer vps = appState.getVoicePlayerServer();
+    	if(vcc != null) {
+	    	appState.getVoiceCaptureClient().close();
+	    	appState.getVoiceCaptureClient().interrupt();
+    	}
+    	if(vps != null) {
+	    	appState.getVoicePlayerServer().close();
+	    	appState.getVoicePlayerServer().interrupt();
+    	}
     	appState.setVoicePlayerServer(null);
     	appState.setVoiceCaptureClient(null);
 		Intent directoryIntent = new Intent(thisActivity.getBaseContext(), ActivityDirectory.class);
