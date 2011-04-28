@@ -54,7 +54,7 @@ public class ActivityCallOngoing extends Activity {
        			}
        			else if(msg.what == DirectoryCommand.S_STATUS_OK.getCode()) {
        				if(msg.obj.equals(DirectoryCommand.C_CALL_HANGUP)) {
-       					//Call.setState(Call.State.IDLE);
+       					Call.setState(Call.State.IDLE);
        					returnToDirectory();
        				}
        			}
