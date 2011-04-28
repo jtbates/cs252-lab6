@@ -30,11 +30,11 @@ public class ActivityHome extends Activity {
 	
     public void Login(View v) {
     	// Set directory server
-    	String server = ActivitySettings.serverName;
-		final String username = ActivitySettings.userName;
+    	String server = ActivitySettings.serverName;			//get server name
+		final String username = ActivitySettings.userName;		//get username
 		
-		User user = new User(username);
-		appState.setUser(user);
+		User user = new User(username);      //create user class
+		appState.setUser(user);				
 			
 	    final ProgressDialog connectDialog = new ProgressDialog(ActivityHome.this);
 	    connectDialog.setMessage("Connecting...");
@@ -45,57 +45,57 @@ public class ActivityHome extends Activity {
 	    final View clickView = v;
 	    final DirectoryClient dc;
 			
-	    Handler loginHandler = new Handler() {
+	    Handler loginHandler = new Handler() {     //handles messages from server
 	    	public void handleMessage(Message msg) {
 	       		Log.i("AH","loginHandler");
 	       		connectDialog.dismiss();
 	       		
    	       		if(msg.what == DirectoryCommand.S_STATUS_OK.getCode() && msg.obj.equals(DirectoryCommand.C_LOGIN)) {
    	       			Intent directoryIntent = new Intent(clickView.getContext(), ActivityDirectory.class);
-   	       			startActivity(directoryIntent);
+   	       			startActivity(directoryIntent);      //starts activity directory intent
    	       		}
    	       		else {
    					CharSequence text = "Login failed";
    					Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG);
-   					toast.show();
+   					toast.show();      //SHOWS THE TOAST
    	       		}
 	       	}
 	    };
 	    
 	    try {
-    		dc = new DirectoryClient(server,user,loginHandler);
+    		dc = new DirectoryClient(server,user,loginHandler);			//creates a new directory client
     		appState.setDirectoryClient(dc);
     		connectDialog.setMessage("Logging in...");
    	       	Log.i("AH","DirectoryClient constructed");
-    		dc.login();
+    		dc.login();							//logs in
     	}
     	catch(Exception e) {
     		Log.e("AH",e.toString());
     		connectDialog.dismiss();
     		CharSequence text = "Could not connect to server";
     		Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG);
-    		toast.show();
+    		toast.show();      //SHOWS MORE TOAST
     	}
     }
 	
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {    //button to get settings
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main);
+        setContentView(R.layout.main);				//sets orientation
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         appState = (VoipApp) getApplicationContext();
         // set call state to idle
         Call.setState(Call.State.IDLE);
        
         SharedPreferences settings = getSharedPreferences(ActivityHome.PREFS_NAME, 0);
-        ActivitySettings.userName = settings.getString("userName", "");
-        ActivitySettings.serverName = settings.getString("serverName", "");
+        ActivitySettings.userName = settings.getString("userName", "");     //saves user name
+        ActivitySettings.serverName = settings.getString("serverName", "");   //saves server name
         
         final Button buttonLogin = (Button) findViewById(R.id.Login);
-        buttonLogin.setOnClickListener(new OnClickListener() {
+        buttonLogin.setOnClickListener(new OnClickListener() {		//when login button is pushed
         	public void onClick(View v) {
-        		Login(v);
+        		Login(v); 					//logs in
         	}
         });
 
